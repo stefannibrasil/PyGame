@@ -1,10 +1,14 @@
+
 # Star Pusher (a Sokoban clone)
 # By Al Sweigart al@inventwithpython.com
 # http://inventwithpython.com/pygame
 # Released under a "Simplified BSD" license
 
+#!/usr/bin/python
+# -*- coding: ascii -*-
 import random, sys, copy, os, pygame
 from pygame.locals import *
+
 
 FPS = 30 # frames per second to update the screen
 WINWIDTH = 1200 # width of the program's window, in pixels
@@ -23,9 +27,9 @@ CAM_MOVE_SPEED = 5 # how many pixels per frame the camera moves
 # decoration on them, such as a tree or rock.
 OUTSIDE_DECORATION_PCT = 20
 
-BRIGHTBLUE = (  0, 170, 255)
+BRIGHTPINK = (255, 102, 178)
 WHITE      = (255, 255, 255)
-BGCOLOR = BRIGHTBLUE
+BGCOLOR = BRIGHTPINK
 TEXTCOLOR = WHITE
 
 UP = 'up'
@@ -47,7 +51,7 @@ def main():
     # when pygame.display.update() is called.
     DISPLAYSURF = pygame.display.set_mode((WINWIDTH, WINHEIGHT))
 
-    pygame.display.set_caption('Star Pusher')
+    pygame.display.set_caption("Jogando com Fracoes")
     BASICFONT = pygame.font.Font('freesansbold.ttf', 18)
 
     # A global dict value that will contain all the Pygame
@@ -126,7 +130,7 @@ def runLevel(levels, levelNum):
     mapObj = decorateMap(levelObj['mapObj'], levelObj['startState']['player'])
     gameStateObj = copy.deepcopy(levelObj['startState'])
     mapNeedsRedraw = True # set to True to call drawMap()
-    levelSurf = BASICFONT.render('Level %s of %s' % (levelNum + 1, len(levels)), 1, TEXTCOLOR)
+    levelSurf = BASICFONT.render('Nivel %s de %s' % (levelNum + 1, len(levels)), 1, TEXTCOLOR)
     levelRect = levelSurf.get_rect()
     levelRect.bottomleft = (20, WINHEIGHT - 35)
     mapWidth = len(mapObj) * TILEWIDTH
@@ -242,7 +246,7 @@ def runLevel(levels, levelNum):
         DISPLAYSURF.blit(mapSurf, mapSurfRect)
 
         DISPLAYSURF.blit(levelSurf, levelRect)
-        stepSurf = BASICFONT.render('Steps: %s' % (gameStateObj['stepCounter']), 1, TEXTCOLOR)
+        stepSurf = BASICFONT.render('Passos: %s' % (gameStateObj['stepCounter']), 1, TEXTCOLOR)
         stepRect = stepSurf.get_rect()
         stepRect.bottomleft = (20, WINHEIGHT - 10)
         DISPLAYSURF.blit(stepSurf, stepRect)
@@ -388,10 +392,10 @@ def startScreen():
     # Unfortunately, Pygame's font & text system only shows one line at
     # a time, so we can't use strings with \n newline characters in them.
     # So we will use a list with each line in it.
-    instructionText = ['Push the stars over the marks.',
-                       'Arrow keys to move, WASD for camera control, P to change character.',
-                       'Backspace to reset level, Esc to quit.',
-                       'N for next level, B to go back a level.']
+    instructionText = ['Aprenda fracoes de um jeito mais divertido!',
+                       'Use as setas para se mover, WASD para controlar a camera, P para mudar seu personagem',
+                       'Espaco para resetar, Esc para sair.',
+                       'N para passar de nivel, B para voltar de nivel.']
 
     # Start with drawing a blank color to the entire window:
     DISPLAYSURF.fill(BGCOLOR)
