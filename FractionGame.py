@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 
 # Star Pusher (a Sokoban clone)
 # By Al Sweigart al@inventwithpython.com
@@ -8,10 +9,10 @@
 # -*- coding: ascii -*-
 import random, sys, copy, os, pygame
 from pygame.locals import *
-
+# -*- coding: utf-8 -*-
 
 FPS = 30 # frames per second to update the screen
-WINWIDTH = 1200 # width of the program's window, in pixels
+WINWIDTH = 800 # width of the program's window, in pixels
 WINHEIGHT = 600 # height in pixels
 HALF_WINWIDTH = int(WINWIDTH / 2)
 HALF_WINHEIGHT = int(WINHEIGHT / 2)
@@ -51,7 +52,7 @@ def main():
     # when pygame.display.update() is called.
     DISPLAYSURF = pygame.display.set_mode((WINWIDTH, WINHEIGHT))
 
-    pygame.display.set_caption("Jogando com Fracoes")
+    pygame.display.set_caption("Brincando com Matemática")
     BASICFONT = pygame.font.Font('freesansbold.ttf', 18)
 
     # A global dict value that will contain all the Pygame
@@ -392,10 +393,11 @@ def startScreen():
     # Unfortunately, Pygame's font & text system only shows one line at
     # a time, so we can't use strings with \n newline characters in them.
     # So we will use a list with each line in it.
-    instructionText = ['Aprenda fracoes de um jeito mais divertido!',
-                       'Use as setas para se mover, WASD para controlar a camera, P para mudar seu personagem',
-                       'Espaco para resetar, Esc para sair.',
-                       'N para passar de nivel, B para voltar de nivel.']
+    instructionText = ['Aprenda Matematica de um jeito mais divertido!',
+                       'Use os botoes para voltar, avancar ou sair do jogo']
+                       #WASD para controlar a camera, P para mudar seu personagem',
+                       #'Espaco para resetar, Esc para sair.',
+                       #'N para passar de nivel, B para voltar de nivel.']
 
     # Start with drawing a blank color to the entire window:
     DISPLAYSURF.fill(BGCOLOR)
