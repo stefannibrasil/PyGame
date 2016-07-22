@@ -76,9 +76,9 @@ void loop() {
     Serial.print(F("Card UID:"));
     dump_byte_array(mfrc522.uid.uidByte, mfrc522.uid.size);
     Serial.println();
-    Serial.print(F("PICC type: "));
-    MFRC522::PICC_Type piccType = mfrc522.PICC_GetType(mfrc522.uid.sak);
-    Serial.println(mfrc522.PICC_GetTypeName(piccType));
+    //Serial.print(F("PICC type: "));
+    //MFRC522::PICC_Type piccType = mfrc522.PICC_GetType(mfrc522.uid.sak);
+    /*Serial.println(mfrc522.PICC_GetTypeName(piccType));
 
     // Check for compatibility
     if (    piccType != MFRC522::PICC_TYPE_MIFARE_MINI
@@ -182,11 +182,12 @@ void loop() {
     Serial.println(F("Current data in sector:"));
     mfrc522.PICC_DumpMifareClassicSectorToSerial(&(mfrc522.uid), &key, sector);
     Serial.println();
-
+*/
     // Halt PICC
     mfrc522.PICC_HaltA();
     // Stop encryption on PCD
     mfrc522.PCD_StopCrypto1();
+    
 }
 
 /**
