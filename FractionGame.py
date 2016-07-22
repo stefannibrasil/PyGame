@@ -5,6 +5,7 @@ import random
 import sys
 import copy
 import os
+import serial
 import pygame
 from pygame.locals import *
 
@@ -56,7 +57,6 @@ def main():
     # A global dict value that will contain all the Pygame
     # Surface objects returned by pygame.image.load().
     IMAGESDICT = {
-        'star': pygame.image.load('Star.png'),
         'title': pygame.image.load('bcm_title.png'),
         'resolvido': pygame.image.load('resolvido.png'),
         'princess': pygame.image.load('princess.png'),
@@ -99,6 +99,14 @@ def main():
         # elif result == 'reset':
         #    pass # Do nothing. Loop re-calls runLevel() to reset the level
 
+def readCard():
+    ser = serial.Serial('/dev/ttyACM0', 9600)
+    while 1 :
+	line = ser.readline()
+	print(line)
+	#if line:
+         #   return line
+    
 
 def runLevel(levels, levelNum):
     global currentImage
@@ -244,6 +252,8 @@ def startScreen():
             elif event.type == KEYDOWN:
                 if event.key == K_ESCAPE:
                     terminate()
+                elif event.key == K_n:
+                    readCard()
                 return  # user has pressed a key, so return.
 
         # Display the DISPLAYSURF contents to the actual screen.
