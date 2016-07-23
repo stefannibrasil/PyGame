@@ -10,8 +10,8 @@ from pygame.locals import *
 
 
 FPS = 30  # frames per second to update the screen
-WINWIDTH = 800  # width of the program's window, in pixels
-WINHEIGHT = 600  # height in pixels
+WINWIDTH = 700  # width of the program's window, in pixels
+WINHEIGHT = 500  # height in pixels
 HALF_WINWIDTH = int(WINWIDTH / 2)
 HALF_WINHEIGHT = int(WINHEIGHT / 2)
 
@@ -31,6 +31,7 @@ WHITE = (255, 255, 255)
 BGCOLOR = PINK
 TEXTCOLOR = WHITE
 
+#acrescentar os botões com 'voltar' 'avançar' 'done' 'quit'
 UP = 'up'
 DOWN = 'down'
 LEFT = 'left'
@@ -56,7 +57,6 @@ def main():
     # A global dict value that will contain all the Pygame
     # Surface objects returned by pygame.image.load().
     IMAGESDICT = {
-        'star': pygame.image.load('Star.png'),
         'title': pygame.image.load('bcm_title.png'),
         'resolvido': pygame.image.load('resolvido.png'),
         'princess': pygame.image.load('princess.png'),
