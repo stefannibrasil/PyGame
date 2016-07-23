@@ -5,13 +5,20 @@ import random
 import sys
 import copy
 import os
+import serial
 import pygame
 from pygame.locals import *
 
 
 FPS = 30  # frames per second to update the screen
+<<<<<<< HEAD
 WINWIDTH = 700  # width of the program's window, in pixels
 WINHEIGHT = 500  # height in pixels
+=======
+WINWIDTH = 900  # width of the program's window, in pixels
+WINHEIGHT = 600  # height in pixels
+THIRD_WINWIDTH = int(WINWIDTH/3)
+>>>>>>> 569a421dd412444c417399b5733d980255fa666b
 HALF_WINWIDTH = int(WINWIDTH / 2)
 HALF_WINHEIGHT = int(WINHEIGHT / 2)
 
@@ -72,6 +79,11 @@ def main():
                     IMAGESDICT['horngirl'],
                     IMAGESDICT['pinkgirl']]
 
+    #IDCARDS = {
+     #   '64 35 15 B8': '1',
+      #  '86 D4 31 3B': '0'
+       # }
+
     startScreen()  # show the title screen until the user presses a key
 
     # Read in the levels from the text file. See the readLevelsFile() for
@@ -99,6 +111,13 @@ def main():
         # elif result == 'reset':
         #    pass # Do nothing. Loop re-calls runLevel() to reset the level
 
+def readCard():
+    ser = serial.Serial('/dev/ttyACM0', 9600)
+    while 1 :
+	line = ser.readline().strip()
+	print(line)
+	if 'Card' in line:
+            return line
 
 def runLevel(levels, levelNum):
     global currentImage
@@ -244,6 +263,51 @@ def startScreen():
             elif event.type == KEYDOWN:
                 if event.key == K_ESCAPE:
                     terminate()
+                else:
+                    mainScreen()
+
+        # Display the DISPLAYSURF contents to the actual screen.
+        pygame.display.update()
+        FPSCLOCK.tick()
+
+
+def mainScreen():
+    """Aqui troca a imagem"""
+
+    # Unfortunately, Pygame's font & text system only shows one line at
+    # a time, so we can't use strings with \n newline characters in them.
+    # So we will use a list with each line in it.
+    instructionText = ['Vamos brincar com Matematica!',
+                       'Aproxime o primeiro bloquinho',
+                       'Aproxime o segundo bloquinho',
+                       'Qual e o resultado?'
+                       ]
+
+    # Start with drawing a blank color to the entire window:
+    DISPLAYSURF.fill(BGCOLOR)
+    right = 0
+
+    # Position and draw the text.
+    for i in range(len(instructionText)):
+        instSurf = BASICFONT.render(instructionText[i], 1, TEXTCOLOR)
+        instRect = instSurf.get_rect()
+        right += 100  # 10 pixels will go in between each line of text.
+        instRect.left = right
+        #instRect.centerx = THIRD_WINWIDTH
+#        topCoord += 30 # Adjust for the height of the line.
+        DISPLAYSURF.blit(instSurf, instRect)
+
+
+    while True:  # Main loop for the start screen.
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                terminate()
+            elif event.type == KEYDOWN:
+                if event.key == K_ESCAPE:
+                    terminate()
+                elif event.key == K_n:
+                    line = readCard()
+                    print("lido: " + line)
                 return  # user has pressed a key, so return.
 
         # Display the DISPLAYSURF contents to the actual screen.
