@@ -11,14 +11,11 @@ from pygame.locals import *
 
 
 FPS = 30  # frames per second to update the screen
-<<<<<<< HEAD
 WINWIDTH = 700  # width of the program's window, in pixels
 WINHEIGHT = 500  # height in pixels
-=======
 WINWIDTH = 900  # width of the program's window, in pixels
 WINHEIGHT = 600  # height in pixels
 THIRD_WINWIDTH = int(WINWIDTH/3)
->>>>>>> 569a421dd412444c417399b5733d980255fa666b
 HALF_WINWIDTH = int(WINWIDTH / 2)
 HALF_WINHEIGHT = int(WINHEIGHT / 2)
 
