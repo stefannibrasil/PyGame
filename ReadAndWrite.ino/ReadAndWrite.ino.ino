@@ -12,9 +12,10 @@
 MFRC522 mfrc522(SS_PIN, RST_PIN);   // Create MFRC522 instance.
 
 MFRC522::MIFARE_Key key;
+
 const int buttonPin = 2; 
 const int ledPin =  13; 
-int buttonState = 0;  
+int buttonNext = 0;  
 
 void setup() {
     pinMode(ledPin, OUTPUT);
@@ -26,10 +27,12 @@ void setup() {
 }
 
 void loop() {
-    buttonState = digitalRead(buttonPin);
+    buttonNext = digitalRead(buttonPin);
     
-    if (buttonState == HIGH) {
+    if (buttonNext == HIGH) {
       digitalWrite(ledPin, HIGH);
+      Serial.write("botao_next");
+      Serial.println();
     } else {
       digitalWrite(ledPin, LOW);
     }

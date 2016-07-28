@@ -6,8 +6,34 @@ import sys
 import copy
 import os
 import serial
+import threading
 import pygame
 from pygame.locals import *
+
+BOTAO_NEXT = USEREVENT
+CARD = BOTAO_NEXT + 1
+
+class SerialThread (threading.Thread):
+    def __init__(self):
+        threading.Thread.__init__(self)
+        self.setDaemon(True)
+    def run (self):
+        ser = serial.Serial('/dev/ttyACM0', 9600, timeout = 0)
+        while 1 :
+            value = ser.readline().strip()
+            if value:
+                print(value)
+                event_type = ''
+                if value == "botao_next":
+                    event_type = BOTAO_NEXT
+                elif 'Card' in value:
+                    event_type = CARD
+
+                event = pygame.event.Event(event_type, code = value)
+                pygame.event.post(event)
+                print("raised event_type=" + str(event_type) + " code = " + value)
+
+
 
 pygame.mixer.init()
 FPS = 30  # frames per second to update the screen
@@ -18,6 +44,7 @@ WINHEIGHT = 600  # height in pixels
 THIRD_WINWIDTH = int(WINWIDTH / 3)
 HALF_WINWIDTH = int(WINWIDTH / 2)
 HALF_WINHEIGHT = int(WINHEIGHT / 2)
+
 
 # The total width and height of each tile in pixels.
 TILEWIDTH = 50
@@ -50,6 +77,8 @@ def main():
     pygame.init()
     FPSCLOCK = pygame.time.Clock()
 
+    SerialThread().start()
+
     # Because the Surface object stored in DISPLAYSURF was returned
     # from the pygame.display.set_mode() function, this is the
     # Surface object that is drawn to the actual computer screen
@@ -71,7 +100,6 @@ def main():
        # }
 
     startScreen()  # show the title screen until the user presses a key
-
         # if result in ('solved', 'next'):
             # Go to the next level.
         # elif result == 'back':
@@ -81,14 +109,6 @@ def main():
         #        currentLevelIndex = len(levels)-1
         # elif result == 'reset':
         #    pass # Do nothing. Loop re-calls runLevel() to reset the level
-
-def readCard():
-    ser = serial.Serial('/dev/ttyACM0', 9600)
-    while 1 :
-	line = ser.readline().strip()
-	print(line)
-	if 'Card' in line:
-            return line
 
 def runLevel(levels, levelNum):
     global currentImage
@@ -223,11 +243,11 @@ def startScreen():
         for event in pygame.event.get():
             if event.type == QUIT:
                 terminate()
+            elif event.type == BOTAO_NEXT:
+                mainScreen()
             elif event.type == KEYDOWN:
                 if event.key == K_ESCAPE:
                     terminate()
-                else:
-                    mainScreen()
 
         # Display the DISPLAYSURF contents to the actual screen.
         pygame.display.update()
@@ -237,11 +257,7 @@ def startScreen():
 def mainScreen():
     """Aqui troca a imagem"""
 
-    # Unfortunately, Pygame's font & text system only shows one line at
-    # a time, so we can't use strings with \n newline characters in them.
-    # So we will use a list with each line in it.
-    instructionText = ['Vamos brincar com Matematica!'
-                       ]
+    instructionText = ['Vamos brincar com Matematica!']
 
     # Start with drawing a blank color to the entire window:
     DISPLAYSURF.fill(BGCOLOR)
@@ -266,7 +282,7 @@ def mainScreen():
                 if event.key == K_ESCAPE:
                     terminate()
                 elif event.key == K_n:
-                    line = readCard()
+                    mainScreen()
                 return  # user has pressed a key, so return.
 
         # Display the DISPLAYSURF contents to the actual screen.
