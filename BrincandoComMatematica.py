@@ -9,6 +9,10 @@ import serial
 import threading
 import pygame
 from pygame.locals import *
+from pygame import mixer
+
+mixer.init()
+game_music = mixer.Sound("letyourbodymove.ogg")
 
 BOTAO_NEXT = USEREVENT
 CARD = BOTAO_NEXT + 1
@@ -64,10 +68,9 @@ TEXTCOLOR = WHITE
 #EXIT = 'exit'
 
 def main():
-    global FPSCLOCK, DISPLAYSURF, IMAGESDICT, TILEMAPPING, OUTSIDEDECOMAPPING, BASICFONT, PLAYERIMAGES, currentImage
+    global FPSCLOCK, DISPLAYSURF, IMAGESDICT, TILEMAPPING, OUTSIDEDECOMAPPING, BASICFONT, PLAYERIMAGES, currentImage, game_music
 
     pygame.init()
-    pygame.mixer.init()
     FPSCLOCK = pygame.time.Clock()
 
     SerialThread().start()
@@ -91,6 +94,7 @@ def startScreen():
     titleRect.centerx = HALF_WINWIDTH
     topCoord += titleRect.height
 
+    game_music.play()
     instructionText = ['Aprenda Matematica de um jeito mais divertido!']
 
     DISPLAYSURF.fill(BGCOLOR)
