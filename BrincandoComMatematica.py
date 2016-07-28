@@ -78,13 +78,13 @@ def main():
     BASICFONT = pygame.font.Font('freesansbold.ttf', 18)
 
     IMAGESDICT = {
-        'title': pygame.image.load('bcm_title.png'),
-        #'resolvido': pygame.image.load('resolvido.png'),}
+        'title': pygame.image.load('bcm_title.png')}
+        #'resolvido': pygame.image.load('resolvido.png')}
 
     startScreen()  # show the title screen until the user presses a key
 
-def startScreen():
 
+def startScreen():
     titleRect = IMAGESDICT['title'].get_rect()
     topCoord = 50  # topCoord tracks where to position the top of the text
     titleRect.top = topCoord
