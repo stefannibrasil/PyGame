@@ -14,8 +14,13 @@ from pygame import mixer
 mixer.init()
 game_music = mixer.Sound("letyourbodymove.ogg")
 
-BOTAO_NEXT = USEREVENT
+BOTAO_NEXT = USEREVENT + 1
 CARD = BOTAO_NEXT + 1
+
+CARDSDICT = {
+    'Card UID: 86 D4 31 3B': '1',
+    'Card UID: 64 35 15 B8': '2'
+    }
 
 class SerialThread (threading.Thread):
     def __init__(self):
@@ -27,7 +32,7 @@ class SerialThread (threading.Thread):
             value = ser.readline().strip()
             if value:
                 print(value)
-                event_type = ''
+                event_type = USEREVENT
                 if value == "botao_next":
                     event_type = BOTAO_NEXT
                 elif 'Card' in value:
@@ -42,7 +47,6 @@ WINWIDTH = 700
 WINHEIGHT = 500
 WINWIDTH = 900
 WINHEIGHT = 600
-THIRD_WINWIDTH = int(WINWIDTH / 3)
 HALF_WINWIDTH = int(WINWIDTH / 2)
 HALF_WINHEIGHT = int(WINHEIGHT / 2)
 
@@ -50,16 +54,11 @@ HALF_WINHEIGHT = int(WINHEIGHT / 2)
 TILEWIDTH = 50
 TILEHEIGHT = 85
 TILEFLOORHEIGHT = 40
-CAM_MOVE_SPEED = 5  # how many pixels per frame the camera moves
 
 PINK = (220, 20, 60)
 WHITE = (255, 255, 255)
 BGCOLOR = PINK
 TEXTCOLOR = WHITE
-
-#Cartoes
-#'64 35 15 B8': '1',
-#'86 D4 31 3B': '0'
 
 #botoes
 #NEXT = 'next'
@@ -71,6 +70,7 @@ def main():
     global FPSCLOCK, DISPLAYSURF, IMAGESDICT, TILEMAPPING, OUTSIDEDECOMAPPING, BASICFONT, PLAYERIMAGES, currentImage, game_music
 
     pygame.init()
+    pygame.font.init()
     FPSCLOCK = pygame.time.Clock()
 
     SerialThread().start()
@@ -104,7 +104,7 @@ def startScreen():
     for i in range(len(instructionText)):
         instSurf = BASICFONT.render(instructionText[i], 1, TEXTCOLOR)
         instRect = instSurf.get_rect()
-        topCoord += 10  # 10 pixels will go in between each line of text.
+        topCoord += 5  # 10 pixels will go in between each line of text.
         instRect.top = topCoord
         instRect.centerx = HALF_WINWIDTH
         topCoord += instRect.height  # Adjust for the height of the line.
@@ -126,11 +126,11 @@ def startScreen():
 
 def mainScreen():
     #Tela que lerá os cartões
-
     instructionText = ['Vamos brincar com Matematica!']
 
     DISPLAYSURF.fill(BGCOLOR)
-    right = 0
+
+    myfont = pygame.font.SysFont("monospace", 50)
 
     for i in range(len(instructionText)):
         instSurf = BASICFONT.render(instructionText[i], 1, TEXTCOLOR)
@@ -146,6 +146,10 @@ def mainScreen():
         for event in pygame.event.get():
             if event.type == QUIT:
                 terminate()
+            elif event.type == CARD:
+                key = event.code
+                label = myfont.render(CARDSDICT[key], 1, (255,255,255))
+                DISPLAYSURF.blit(label, (100, 100))
             elif event.type == KEYDOWN:
                 if event.key == K_ESCAPE:
                     terminate()
