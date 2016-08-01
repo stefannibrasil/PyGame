@@ -126,21 +126,15 @@ def startScreen():
 
 def mainScreen():
     #Tela que lerá os cartões
-    instructionText = ['Vamos brincar com Matematica!']
-
     DISPLAYSURF.fill(BGCOLOR)
 
     myfont = pygame.font.SysFont("monospace", 50)
 
-    for i in range(len(instructionText)):
-        instSurf = BASICFONT.render(instructionText[i], 1, TEXTCOLOR)
-        instRect = instSurf.get_rect()
-        right += 100  # 10 pixels will go in between each line of text.
-        instRect.left = right
-        #instRect.centerx = THIRD_WINWIDTH
-#        topCoord += 30 # Adjust for the height of the line.
-        DISPLAYSURF.blit(instSurf, instRect)
+    instructionText = myfont.render('Vamos brincar com Matematica!', 1, (0,0,0))
+    DISPLAYSURF.blit(instructionText, (50, 0))
 
+    x = 10
+    y = 30
 
     while True:  # Main loop for the start screen.
         for event in pygame.event.get():
@@ -149,7 +143,8 @@ def mainScreen():
             elif event.type == CARD:
                 key = event.code
                 label = myfont.render(CARDSDICT[key], 1, (255,255,255))
-                DISPLAYSURF.blit(label, (100, 100))
+                DISPLAYSURF.blit(label, (x,y))
+                x = x + 80
             elif event.type == KEYDOWN:
                 if event.key == K_ESCAPE:
                     terminate()
