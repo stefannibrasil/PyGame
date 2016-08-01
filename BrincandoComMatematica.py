@@ -128,13 +128,13 @@ def mainScreen():
     #Tela que lerá os cartões
     DISPLAYSURF.fill(BGCOLOR)
 
-    myfont = pygame.font.SysFont("monospace", 50)
+    myfont = pygame.font.SysFont('freesansbold.ttf', 45)
 
-    instructionText = myfont.render('Vamos brincar com Matematica!', 1, (0,0,0))
+    instructionText = myfont.render('Vamos brincar com Matematica!', 1, (WHITE))
     DISPLAYSURF.blit(instructionText, (50, 0))
 
     x = 10
-    y = 30
+    y = 50
 
     while True:  # Main loop for the start screen.
         for event in pygame.event.get():
@@ -144,7 +144,7 @@ def mainScreen():
                 key = event.code
                 label = myfont.render(CARDSDICT[key], 1, (255,255,255))
                 DISPLAYSURF.blit(label, (x,y))
-                x = x + 80
+                x = x + 100
             elif event.type == KEYDOWN:
                 if event.key == K_ESCAPE:
                     terminate()
@@ -154,6 +154,11 @@ def mainScreen():
 
         pygame.display.update()
         FPSCLOCK.tick()
+
+#def calculate()
+    #card1 + card 2 = result
+    #if CARDSDICT(key[2])== result
+        #titleRect = IMAGESDICT['resolvido'].get_rect()
 
 def terminate():
     pygame.quit()
