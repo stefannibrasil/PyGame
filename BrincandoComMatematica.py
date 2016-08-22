@@ -19,7 +19,16 @@ CARD = BOTAO_NEXT + 1
 
 CARDSDICT = {
     'Card UID: 86 D4 31 3B': '1',
-    'Card UID: 64 35 15 B8': '2'
+    'Card UID: 64 35 15 B8': '2',
+    'Card UID: 86 20 48 49': '3',
+    'Card UID: 66 DE 2B 49': '4',
+    'Card UID: 06 DA 3E 49': '5',
+    'Card UID: 66 82 4A 49': '6',
+    'Card UID: 5A 43 06 4C': '/',
+    'Card UID: 3A 17 FF 4B': '+',
+    'Card UID: 85 5D 0F 64': '-',
+    'Card UID: CA 94 10 64': '=',
+    'Card UID: 8A 7D 0F 64': '*',
     }
 
 class SerialThread (threading.Thread):
@@ -60,11 +69,6 @@ WHITE = (255, 255, 255)
 BGCOLOR = PINK
 TEXTCOLOR = WHITE
 
-#botoes
-#NEXT = 'next'
-#BACK = 'back'
-#ENTER = 'enter'
-#EXIT = 'exit'
 
 def main():
     global FPSCLOCK, DISPLAYSURF, IMAGESDICT, TILEMAPPING, OUTSIDEDECOMAPPING, BASICFONT, PLAYERIMAGES, currentImage, game_music
@@ -83,6 +87,8 @@ def main():
     IMAGESDICT = {
         'title': pygame.image.load('bcm_title.png')}
         #'resolvido': pygame.image.load('resolvido.png')}
+        #'desafio': pygame.image.load('ORDEM.png')}
+        #'incorreto': pygame.image.load('TEM_CERTEZA.png')}
 
     startScreen()  # show the title screen until the user presses a key
 
