@@ -26,7 +26,7 @@ CARDSDICT = {
     'Card UID: 66 82 4A 49': '6',
     'Card UID: 5A 43 06 4C': '/',
     'Card UID: 3A 17 FF 4B': '+',
-    'Card UID: 85 5D 0F 64': '-',
+    'Card UID: 8A 5D 0F 64': '-',
     'Card UID: CA 94 10 64': '=',
     'Card UID: 8A 7D 0F 64': '*',
     }
@@ -85,10 +85,10 @@ def main():
     BASICFONT = pygame.font.Font('freesansbold.ttf', 18)
 
     IMAGESDICT = {
-        'title': pygame.image.load('bcm_title.png')}
-        #'resolvido': pygame.image.load('resolvido.png')}
-        #'desafio': pygame.image.load('ORDEM.png')}
-        #'incorreto': pygame.image.load('TEM_CERTEZA.png')}
+        'title': pygame.image.load('bcm_title.png'),
+        'resolvido': pygame.image.load('resolvido.png'),
+        'desafio': pygame.image.load('ORDEM.png'),
+        'incorreto': pygame.image.load('TEM_CERTEZA.png')}
 
     startScreen()  # show the title screen until the user presses a key
 
@@ -133,7 +133,7 @@ def startScreen():
 def mainScreen():
     #Tela que lerá os cartões
     DISPLAYSURF.fill(BGCOLOR)
-
+    LISTA_NUMEROS = []
     myfont = pygame.font.SysFont('freesansbold.ttf', 45)
 
     instructionText = myfont.render('Vamos brincar com Matematica!', 1, (WHITE))
@@ -148,9 +148,18 @@ def mainScreen():
                 terminate()
             elif event.type == CARD:
                 key = event.code
+                value = CARDSDICT[key]
+                LISTA_NUMEROS.append(value)
                 label = myfont.render(CARDSDICT[key], 1, (255,255,255))
                 DISPLAYSURF.blit(label, (x,y))
                 x = x + 100
+                if len(LISTA_NUMEROS) == 5:
+                    resultado_calculate = calculate(LISTA_NUMEROS)
+                    if resultado_calculate:
+                        DISPLAYSURF.blit(IMAGESDICT['resolvido'], titleRect)
+                    else:
+                        DISPLAYSURF.blit(IMAGESDICT['incorreto'], titleRect)
+                    LISTA_NUMEROS = []
             elif event.type == KEYDOWN:
                 if event.key == K_ESCAPE:
                     terminate()
@@ -161,10 +170,28 @@ def mainScreen():
         pygame.display.update()
         FPSCLOCK.tick()
 
-#def calculate()
-    #card1 + card 2 = result
-    #if CARDSDICT(key[2])== result
-        #titleRect = IMAGESDICT['resolvido'].get_rect()
+def calculate(LISTA_NUMEROS):
+
+    operacao = LISTA_NUMEROS[1]
+    num_1 = int(LISTA_NUMEROS[0])
+    num_2 = int(LISTA_NUMEROS[2])
+    resultado = int(LISTA_NUMEROS[4])
+    resultado_certo = 0
+
+    if operacao == '+':
+        resultado_certo = num_1 + num_2
+    elif operacao == '-':
+        resultado_certo = num_1 - num_2
+    elif operacao == '*':
+        resultado_certo = num_1 * num_2
+    elif operacao == '/':
+        resultado_certo = num_1 / num_2
+
+    if resultado_certo == resultado:
+        return True
+    else:
+        return False
+
 
 def terminate():
     pygame.quit()
