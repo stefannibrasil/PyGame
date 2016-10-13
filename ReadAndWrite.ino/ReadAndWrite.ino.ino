@@ -28,7 +28,6 @@ void setup() {
 }
 
 void loop() {
-    
      if (sair.isPressed())
         Serial.println("botao_sair");
   
@@ -49,7 +48,7 @@ void loop() {
     Serial.print(F("Card UID:"));
     dump_byte_array(mfrc522.uid.uidByte, mfrc522.uid.size);
     Serial.println();
-   
+    
     // Halt PICC
     mfrc522.PICC_HaltA();
     // Stop encryption on PCD

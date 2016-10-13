@@ -11,12 +11,32 @@ import pygame
 from pygame.locals import *
 from pygame import mixer
 
+#sons do jogo
 mixer.init()
-game_music = mixer.Sound("letyourbodymove.ogg")
+os.getcwd()
+game_music = mixer.Sound("/Sons/letyourbodymove.ogg")
+
+SOUNDSDICT = {
+    'numero1': mixer.Sound('Número_1.mp3'),
+    'numero2': mixer.Sound('Número_2.mp3'),
+    'numero3': mixer.Sound('Número_3.mp3'),
+    'numero4': mixer.Sound('Número_4.mp3'),
+    'numero5': mixer.Sound('Número_5.mp3'),
+    'numero6': mixer.Sound('Número_6.mp3'),
+    'numero7': mixer.Sound('Número_7.mp3'),
+    'numero8': mixer.Sound('Número_8.mp3'),
+    'numero9': mixer.Sound('Número_9.mp3'),
+    'igual': mixer.Sound('Igual_a.mp3'),
+    'adicao': mixer.Sound('Mais.mp3'),
+    'multiplicacao': mixer.Sound('Vezes.mp3')
+}
+
+#tratando eventos do Arduino
 
 BOTAO_AVANCAR = USEREVENT + 1
 BOTAO_SAIR = USEREVENT + 2
 BOTAO_RETORNAR = USEREVENT + 3
+BUZZER = USEREVENT + 4
 CARD = USEREVENT + 1
 
 CARDSDICT = {
@@ -50,6 +70,8 @@ class SerialThread (threading.Thread):
                     event_type = BOTAO_SAIR
                 if value == "botao_retornar":
                     event_type = BOTAO_RETORNAR
+                if value == "cartao_lido":
+                    event_type = BUZZER
                 elif 'Card' in value:
                     event_type = CARD
 
@@ -154,6 +176,7 @@ def mainScreen():
             elif event.type == CARD:
                 key = event.code
                 value = CARDSDICT[key]
+                #   playSound(value)
                 LISTA_NUMEROS.append(value)
                 label = myfont.render(CARDSDICT[key], 1, (255,255,255))
                 DISPLAYSURF.blit(label, (x,y))
@@ -202,9 +225,15 @@ def calculate(LISTA_NUMEROS):
         return False
 
 
+def playSound(value):
+    if SOUNDSDICT.has_key(value):
+       SOUNDSDICT[value].play()
+
+
 def terminate():
     pygame.quit()
     sys.exit()
+
 
 if __name__ == '__main__':
     main()
