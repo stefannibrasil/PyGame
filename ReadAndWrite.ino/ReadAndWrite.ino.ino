@@ -1,3 +1,4 @@
+
 /**
  * ----------------------------------------------------------------------------
  * This is a MFRC522 library example; see https://github.com/miguelbalboa/rfid
@@ -5,6 +6,7 @@
 
 #include <SPI.h>
 #include <MFRC522.h>
+#include <Button.h>
 
 #define RST_PIN         9           // Configurable, see typical pin layout above
 #define SS_PIN          10          // Configurable, see typical pin layout above
@@ -13,13 +15,12 @@ MFRC522 mfrc522(SS_PIN, RST_PIN);   // Create MFRC522 instance.
 
 MFRC522::MIFARE_Key key;
 
-const int buttonPin = 2; 
-const int ledPin =  13; 
-int buttonNext = 0;  
+Button sair = Button(2,PULLUP);
+Button avancar = Button(4,PULLUP);
+Button retornar = Button(7,PULLUP);
+
 
 void setup() {
-    pinMode(ledPin, OUTPUT);
-    pinMode(buttonPin, INPUT);
     Serial.begin(9600); // Initialize serial communications with the PC
     while (!Serial);    // Do nothing if no serial port is opened (added for Arduinos based on ATMEGA32U4)
     SPI.begin();        // Init SPI bus
@@ -27,16 +28,16 @@ void setup() {
 }
 
 void loop() {
-    buttonNext = digitalRead(buttonPin);
     
-    if (buttonNext == HIGH) {
-      digitalWrite(ledPin, HIGH);
-      Serial.write("botao_next");
-      Serial.println();
-    } else {
-      digitalWrite(ledPin, LOW);
-    }
-    
+     if (sair.isPressed())
+        Serial.println("botao_sair");
+  
+     if (avancar.isPressed())
+        Serial.println("botao_avancar");
+  
+     if (retornar.isPressed()) {
+        Serial.println("botao_retornar");
+     }
     // Look for new cards
     if ( ! mfrc522.PICC_IsNewCardPresent())
         return;
