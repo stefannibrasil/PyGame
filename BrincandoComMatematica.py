@@ -161,10 +161,12 @@ def mainScreen():
                 if len(LISTA_NUMEROS) == 5:
                     resultado_calculate = calculate(LISTA_NUMEROS)
                     if resultado_calculate:
-                        pygame.display.blit(IMAGESDICT['resolvido'], (0,0))
+                        DISPLAYSURF.fill(BGCOLOR)
+                        DISPLAYSURF.blit(IMAGESDICT['resolvido'], (30,50))
                         pygame.display.flip()
                     else:
-                        pygame.display.blit(IMAGESDICT['incorreto'], (0,0))
+                        DISPLAYSURF.fill(BGCOLOR)
+                        DISPLAYSURF.blit(IMAGESDICT['incorreto'], (30,50))
                         pygame.display.flip()
                     LISTA_NUMEROS = []
             elif event.type == KEYDOWN:
