@@ -14,21 +14,21 @@ from pygame import mixer
 #sons do jogo
 mixer.init()
 os.getcwd()
-game_music = mixer.Sound("/Sons/letyourbodymove.ogg")
+game_music = mixer.Sound("letyourbodymove.ogg")
 
 SOUNDSDICT = {
-    'numero1': mixer.Sound('Número_1.mp3'),
-    'numero2': mixer.Sound('Número_2.mp3'),
-    'numero3': mixer.Sound('Número_3.mp3'),
-    'numero4': mixer.Sound('Número_4.mp3'),
-    'numero5': mixer.Sound('Número_5.mp3'),
-    'numero6': mixer.Sound('Número_6.mp3'),
-    'numero7': mixer.Sound('Número_7.mp3'),
-    'numero8': mixer.Sound('Número_8.mp3'),
-    'numero9': mixer.Sound('Número_9.mp3'),
-    'igual': mixer.Sound('Igual_a.mp3'),
-    'adicao': mixer.Sound('Mais.mp3'),
-    'multiplicacao': mixer.Sound('Vezes.mp3')
+    '1': mixer.Sound('Número_1.mp3'),
+    '2': mixer.Sound('Número_2.mp3'),
+    '3': mixer.Sound('Número_3.mp3'),
+    '4': mixer.Sound('Número_4.mp3'),
+    '5': mixer.Sound('Número_5.mp3'),
+    '6': mixer.Sound('Número_6.mp3'),
+    '7': mixer.Sound('Número_7.mp3'),
+    '8': mixer.Sound('Número_8.mp3'),
+    '9': mixer.Sound('Número_9.mp3'),
+    '=': mixer.Sound('Igual_a.mp3'),
+    '+': mixer.Sound('Mais.mp3'),
+    '*': mixer.Sound('Vezes.mp3')
 }
 
 #tratando eventos do Arduino
@@ -36,7 +36,6 @@ SOUNDSDICT = {
 BOTAO_AVANCAR = USEREVENT + 1
 BOTAO_SAIR = USEREVENT + 2
 BOTAO_RETORNAR = USEREVENT + 3
-BUZZER = USEREVENT + 4
 CARD = USEREVENT + 1
 
 CARDSDICT = {
@@ -58,7 +57,7 @@ class SerialThread (threading.Thread):
         threading.Thread.__init__(self)
         self.setDaemon(True)
     def run (self):
-        ser = serial.Serial('/dev/ttyACM0', 9600, timeout = 0)
+        ser = serial.Serial('/dev/ttyACM0', 9600, timeout = 1)
         while 1 :
             value = ser.readline().strip()
             if value:
@@ -70,8 +69,6 @@ class SerialThread (threading.Thread):
                     event_type = BOTAO_SAIR
                 if value == "botao_retornar":
                     event_type = BOTAO_RETORNAR
-                if value == "cartao_lido":
-                    event_type = BUZZER
                 elif 'Card' in value:
                     event_type = CARD
 
@@ -148,7 +145,7 @@ def startScreen():
                 terminate()
             elif event.type == BOTAO_AVANCAR:
                 #if event.key == K_SPACE:
-                    mainScreen()
+                mainScreen()
             elif event.type == KEYDOWN:
                 if event.key == K_ESCAPE:
                     terminate()
@@ -176,34 +173,42 @@ def mainScreen():
             elif event.type == CARD:
                 key = event.code
                 value = CARDSDICT[key]
-                #   playSound(value)
+                #playSound(value)
                 LISTA_NUMEROS.append(value)
                 label = myfont.render(CARDSDICT[key], 1, (255,255,255))
                 DISPLAYSURF.blit(label, (x,y))
                 x = x + 100
                 if len(LISTA_NUMEROS) == 5:
-                    resultado_calculate = calculate(LISTA_NUMEROS)
-                    if resultado_calculate:
-                        DISPLAYSURF.fill(BGCOLOR)
-                        DISPLAYSURF.blit(IMAGESDICT['resolvido'], (30,50))
-                        pygame.display.flip()
+                    if check_expression(LISTA_NUMEROS):
+                        if calculate(LISTA_NUMEROS):
+                            DISPLAYSURF.fill(BGCOLOR)
+                            DISPLAYSURF.blit(IMAGESDICT['resolvido'], (30,50))
+                            pygame.display.flip()
+                        else:
+                            DISPLAYSURF.fill(BGCOLOR)
+                            DISPLAYSURF.blit(IMAGESDICT['incorreto'], (30,50))
+                            pygame.display.flip()
+                        LISTA_NUMEROS = []
                     else:
-                        DISPLAYSURF.fill(BGCOLOR)
-                        DISPLAYSURF.blit(IMAGESDICT['incorreto'], (30,50))
-                        pygame.display.flip()
-                    LISTA_NUMEROS = []
+                        instructionText = myfont.render('Expressão mal formada, tente novamente!', 1, (WHITE))
+                        DISPLAYSURF.blit(instructionText, (50, 0))
             elif event.type == KEYDOWN:
                 if event.key == K_ESCAPE:
                     terminate()
-                elif event.key == BOTAO_RETORNAR:
-                    mainScreen()
                 return  # user has pressed a key, so return.
 
         pygame.display.update()
         FPSCLOCK.tick()
 
-def calculate(LISTA_NUMEROS):
+def check_expression(LISTA_NUMEROS):
+    return (LISTA_NUMEROS[0].isdigit()
+    and (LISTA_NUMEROS[1] == '+' or LISTA_NUMEROS[1] == '*')
+    and LISTA_NUMEROS[2].isdigit()
+    and LISTA_NUMEROS[4].isdigit()
+    and LISTA_NUMEROS[3] == '=')
 
+
+def calculate(LISTA_NUMEROS):
     num_1 = int(LISTA_NUMEROS[0])
     operacao = LISTA_NUMEROS[1]
     num_2 = int(LISTA_NUMEROS[2])
@@ -229,11 +234,9 @@ def playSound(value):
     if SOUNDSDICT.has_key(value):
        SOUNDSDICT[value].play()
 
-
 def terminate():
     pygame.quit()
     sys.exit()
-
 
 if __name__ == '__main__':
     main()
