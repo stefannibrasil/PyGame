@@ -17,18 +17,18 @@ os.getcwd()
 game_music = mixer.Sound("letyourbodymove.ogg")
 
 SOUNDSDICT = {
-    '1': mixer.Sound('Número_1.mp3'),
-    '2': mixer.Sound('Número_2.mp3'),
-    '3': mixer.Sound('Número_3.mp3'),
-    '4': mixer.Sound('Número_4.mp3'),
-    '5': mixer.Sound('Número_5.mp3'),
-    '6': mixer.Sound('Número_6.mp3'),
-    '7': mixer.Sound('Número_7.mp3'),
-    '8': mixer.Sound('Número_8.mp3'),
-    '9': mixer.Sound('Número_9.mp3'),
-    '=': mixer.Sound('Igual_a.mp3'),
-    '+': mixer.Sound('Mais.mp3'),
-    '*': mixer.Sound('Vezes.mp3')
+    '1': 'Número_1.mp3',
+    '2': 'Número_2.mp3',
+    '3': 'Número_3.mp3',
+    '4': 'Número_4.mp3',
+    '5': 'Número_5.mp3',
+    '6': 'Número_6.mp3',
+    '7': 'Número_7.mp3',
+    '8': 'Número_8.mp3',
+    '9': 'Número_9.mp3',
+    '=': 'Igual_a.mp3',
+    '+': 'Mais.mp3',
+    '*': 'Vezes.mp3'
 }
 
 #tratando eventos do Arduino
@@ -123,6 +123,7 @@ def startScreen():
     titleRect.centerx = HALF_WINWIDTH
     topCoord += titleRect.height
 
+    game_music.set_volume(0.3) 
     game_music.play()
     instructionText = ['Aprenda Matematica de um jeito mais divertido!']
 
@@ -173,7 +174,7 @@ def mainScreen():
             elif event.type == CARD:
                 key = event.code
                 value = CARDSDICT[key]
-                #playSound(value)
+                playSound(value)
                 LISTA_NUMEROS.append(value)
                 label = myfont.render(CARDSDICT[key], 1, (255,255,255))
                 DISPLAYSURF.blit(label, (x,y))
@@ -232,7 +233,14 @@ def calculate(LISTA_NUMEROS):
 
 def playSound(value):
     if SOUNDSDICT.has_key(value):
-       SOUNDSDICT[value].play()
+        value = SOUNDSDICT[value]
+        play_sound(value)
+
+def play_sound(path):
+    canonicalized_path = path.replace('/', os.sep).replace('\\', os.sep)
+    pygame.mixer.music.load(canonicalized_path)
+    pygame.mixer.music.set_volume(1.0)
+    pygame.mixer.music.play()
 
 def terminate():
     pygame.quit()
