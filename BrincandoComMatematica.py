@@ -2,6 +2,7 @@
 #!/usr/bin/python
 # -*- coding: ascii -*-
 import random
+from random import randrange
 import sys
 import copy
 import os
@@ -15,6 +16,8 @@ from pygame import mixer
 mixer.init()
 os.getcwd()
 game_music = mixer.Sound("letyourbodymove.ogg")
+
+INSTRUCTIONSDICT = { }
 
 SOUNDSDICT = {
     '1': 'Número_1.mp3',
@@ -32,7 +35,6 @@ SOUNDSDICT = {
 }
 
 #tratando eventos do Arduino
-
 BOTAO_AVANCAR = USEREVENT + 1
 BOTAO_SAIR = USEREVENT + 2
 BOTAO_RETORNAR = USEREVENT + 3
@@ -81,6 +83,7 @@ WINWIDTH = 700
 WINHEIGHT = 600
 HALF_WINWIDTH = int(WINWIDTH / 2)
 HALF_WINHEIGHT = int(WINHEIGHT / 2)
+OUTSIDE_DECORATION_PCT = 20
 
 # The total width and height of each tile in pixels.
 TILEWIDTH = 50
@@ -94,7 +97,10 @@ TEXTCOLOR = WHITE
 
 
 def main():
-    global FPSCLOCK, DISPLAYSURF, IMAGESDICT, TILEMAPPING, OUTSIDEDECOMAPPING, BASICFONT, PLAYERIMAGES, currentImage, game_music
+    numeros = [2, 3, 4, 5, 6, 7, 8, 9];
+    random_index = randrange(0,len(numeros))
+    print numeros[random_index]
+    global FPSCLOCK, DISPLAYSURF, IMAGESDICT, TILEMAPPING, OUTSIDEDECOMAPPING, BASICFONT, PLAYERIMAGES, game_music, random_index
 
     pygame.init()
     pygame.font.init()
@@ -111,7 +117,12 @@ def main():
         'title': pygame.image.load('bcm_title.png'),
         'resolvido': pygame.image.load('resolvido.png'),
         'desafio': pygame.image.load('ORDEM.png'),
-        'incorreto': pygame.image.load('TEM_CERTEZA.png')}
+        'incorreto': pygame.image.load('TEM_CERTEZA.png'),
+        'princess': pygame.image.load('princess.png'),
+        'boy': pygame.image.load('boy.png'),
+        'catgirl': pygame.image.load('catgirl.png'),
+        'horngirl': pygame.image.load('horngirl.png'),
+        'pinkgirl': pygame.image.load('pinkgirl.png')}
 
     startScreen()  # show the title screen until the user presses a key
 
@@ -123,7 +134,7 @@ def startScreen():
     titleRect.centerx = HALF_WINWIDTH
     topCoord += titleRect.height
 
-    game_music.set_volume(0.3) 
+    game_music.set_volume(0.3)
     game_music.play()
     instructionText = ['Aprenda Matematica de um jeito mais divertido!']
 
@@ -146,7 +157,9 @@ def startScreen():
                 terminate()
             elif event.type == BOTAO_AVANCAR:
                 #if event.key == K_SPACE:
-                mainScreen()
+                level_one()
+            elif event.type == K_n:
+                level_two()
             elif event.type == KEYDOWN:
                 if event.key == K_ESCAPE:
                     terminate()
@@ -155,8 +168,8 @@ def startScreen():
         FPSCLOCK.tick()
 
 
-def mainScreen():
-    #Tela que lerá os cartões
+def level_one():
+    #Tela que checa resultado da operacao escolhida pelo usuario
     DISPLAYSURF.fill(BGCOLOR)
     LISTA_NUMEROS = []
     myfont = pygame.font.SysFont('freesansbold.ttf', 45)
@@ -193,9 +206,53 @@ def mainScreen():
                     else:
                         instructionText = myfont.render('Expressão mal formada, tente novamente!', 1, (WHITE))
                         DISPLAYSURF.blit(instructionText, (50, 0))
-            elif event.type == KEYDOWN:
-                if event.key == K_ESCAPE:
-                    terminate()
+            elif event.type == BOTAO_RETORNAR:
+                mainScreen()
+                return  # user has pressed a key, so return.
+
+        pygame.display.update()
+        FPSCLOCK.tick()
+
+
+def level_two():
+    DISPLAYSURF.fill(BGCOLOR)
+    myfont = pygame.font.SysFont('freesansbold.ttf', 45)
+    LISTA_NUMEROS = []
+    instructionText = myfont.render('Qual operacao voce consegue chegar no seguinte resultado?', 1, (WHITE))
+    instructionText = myfont.render(random_index, 1, (WHITE))
+    DISPLAYSURF.blit(instructionText, (50, 0))
+
+    x = 20
+    y = 60
+
+    while True:  # Loop principal para a tela atual
+        for event in pygame.event.get():
+            if event.type == BOTAO_SAIR:
+                terminate()
+            elif event.type == CARD:
+                key = event.code
+                value = CARDSDICT[key]
+                playSound(value)
+                LISTA_NUMEROS.append(value)
+                label = myfont.render(CARDSDICT[key], 1, (255,255,255))
+                DISPLAYSURF.blit(label, (x,y))
+                x = x + 100
+                if len(LISTA_NUMEROS) == 5:
+                    if check_expression(LISTA_NUMEROS):
+                        if calculate_op(LISTA_NUMEROS):
+                            DISPLAYSURF.fill(BGCOLOR)
+                            DISPLAYSURF.blit(IMAGESDICT['resolvido'], (30,50))
+                            pygame.display.flip()
+                        else:
+                            DISPLAYSURF.fill(BGCOLOR)
+                            DISPLAYSURF.blit(IMAGESDICT['incorreto'], (30,50))
+                            pygame.display.flip()
+                        LISTA_NUMEROS = []
+                    else:
+                        instructionText = myfont.render('Expressão mal formada, tente novamente!', 1, (WHITE))
+                        DISPLAYSURF.blit(instructionText, (50, 0))
+            elif event.type == BOTAO_RETORNAR:
+                level_one()
                 return  # user has pressed a key, so return.
 
         pygame.display.update()
@@ -207,7 +264,6 @@ def check_expression(LISTA_NUMEROS):
     and LISTA_NUMEROS[2].isdigit()
     and LISTA_NUMEROS[4].isdigit()
     and LISTA_NUMEROS[3] == '=')
-
 
 def calculate(LISTA_NUMEROS):
     num_1 = int(LISTA_NUMEROS[0])
@@ -230,6 +286,28 @@ def calculate(LISTA_NUMEROS):
     else:
         return False
 
+
+def calculate_op():
+    num_1 = int(LISTA_NUMEROS[0])
+    operacao = LISTA_NUMEROS[1]
+    num_2 = int(LISTA_NUMEROS[2])
+
+    resultado = random_index
+    resultado_certo = 0
+
+    if operacao == '+':
+        resultado_certo = num_1 + num_2
+    elif operacao == '-':
+        resultado_certo = num_1 - num_2
+    elif operacao == '*':
+        resultado_certo = num_1 * num_2
+    elif operacao == '/':
+        resultado_certo = num_1 / num_2
+
+    if resultado_certo == resultado:
+        return True
+    else:
+        return False
 
 def playSound(value):
     if SOUNDSDICT.has_key(value):
