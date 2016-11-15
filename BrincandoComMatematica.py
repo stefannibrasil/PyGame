@@ -66,6 +66,14 @@ CARDSDICT = {
     'Card UID: 86 D4 31 3B': '*',
     }
 
+#sorteio do level_two para deixar a random_index como variavel global
+numeros = [2, 3, 4, 5, 6, 7, 8, 9];
+random_index = randrange(0,len(numeros))
+a = randrange(2, len(numeros))
+b = randrange(2, len(numeros))
+
+acertos = 0
+
 class SerialThread (threading.Thread):
     def __init__(self):
         threading.Thread.__init__(self)
@@ -109,15 +117,8 @@ TEXTCOLOR = WHITE
 
 
 def main():
-    global FPSCLOCK, DISPLAYSURF, IMAGESDICT, TILEMAPPING, OUTSIDEDECOMAPPING, BASICFONT, PLAYERIMAGES, game_music, random_index
+    global FPSCLOCK, DISPLAYSURF, IMAGESDICT, TILEMAPPING, OUTSIDEDECOMAPPING, BASICFONT, PLAYERIMAGES
 
-    #sorteio do level_two para deixar a random_index como variavel global
-    numeros = [2, 3, 4, 5, 6, 7, 8, 9];
-    random_index = randrange(0,len(numeros))
-    a = randrange(2, len(numeros))
-    b = randrange(2, len(numeros))
-
-    acertos = 0
     pygame.init()
     pygame.font.init()
     FPSCLOCK = pygame.time.Clock()
@@ -140,7 +141,7 @@ def main():
         'horngirl': pygame.image.load('horngirl.png'),
         'pinkgirl': pygame.image.load('pinkgirl.png')}
 
-    startScreen()  #mainScreen espera o usuario apertar o botao_avancar para chamar a startScreen, tela inicial
+    startScreen()  #mainScreen espera o usuario apertar o botao_avancar para chamar a startScreen
 
 
 def startScreen():
@@ -161,6 +162,7 @@ def startScreen():
 
     DISPLAYSURF.blit(IMAGESDICT['title'], titleRect)
 
+    #posicionando as instrucoes na tela
     for i in range(len(instructionText)):
         instSurf = BASICFONT.render(instructionText[i], 1, TEXTCOLOR)
         instRect = instSurf.get_rect()
@@ -234,6 +236,7 @@ def level_one():
             elif event.type == BOTAO_RETORNAR:
                 mainScreen()
                 return  # usuario apertou retornar para tela principal.
+        #level_two() chama nivel dois porque o usuario ja acertou 5 vezes
         pygame.display.update()
         FPSCLOCK.tick()
 
@@ -286,7 +289,7 @@ def level_two():
             elif event.type == BOTAO_RETORNAR:
                 level_one()
                 return  # usuario retorna para level_one
-
+        #level_three() chama nivel tres pois ja acertou 5 vezes
         pygame.display.update()
         FPSCLOCK.tick()
 
@@ -300,10 +303,6 @@ def level_three():
     x = 20
     y = 60
 
-    #print "x + ", x, " = ", y
-    #resultado = input("valor de x: ")
-
-
         while True:  # Loop principal para a tela nivel_three
         #while acertos < 5:
             for event in pygame.event.get():
@@ -313,11 +312,11 @@ def level_three():
                     key = event.code
                     value = CARDSDICT[key]
                     playSound(value)
-                    LISTA_NUMEROS.append(value)
                     label = myfont.render(CARDSDICT[key], 1, (255,255,255))
+                    #print "x + ", x, " = ", y
                     DISPLAYSURF.blit(label, (x,y))
                     x = x + 100
-                    if calculate_equacao(a, b, resultado):
+                    if calculate_equacao(a, b, value):
                         DISPLAYSURF.fill(BGCOLOR)
                         DISPLAYSURF.blit(IMAGESDICT['resolvido'], (30,50))
                         #label = myfont.render(" ", 1, (255,255,255))
@@ -396,10 +395,10 @@ def calculate_op():
         return False
 
 
-def calculate_equacao(a, b, resultado):
+def calculate_equacao(a, b, value):
     resultado_certo = b - a
 
-    if resultado_certo == resultado:
+    if resultado_certo == value:
         return True
     else:
         return False
