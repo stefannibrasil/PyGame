@@ -221,7 +221,7 @@ def level_one():
                             DISPLAYSURF.blit(IMAGESDICT['resolvido'], (30,50))
                             #playSound('aplausos.mp3')
                             pygame.display.flip()
-                            acertos++
+                            acertos += 1
                         else:
                             DISPLAYSURF.fill(BGCOLOR)
                             DISPLAYSURF.blit(IMAGESDICT['incorreto'], (30,50))
@@ -273,7 +273,7 @@ def level_two():
                             #label = myfont.render(" ", 1, (255,255,255))
                             #playSound('aplausos.mp3')
                             pygame.display.flip()
-                            acertos++
+                            acertos += 1
                         else:
                             DISPLAYSURF.fill(BGCOLOR)
                             DISPLAYSURF.blit(IMAGESDICT['incorreto'], (30,50))
@@ -322,7 +322,7 @@ def level_three():
                         #label = myfont.render(" ", 1, (255,255,255))
                         #playSound('aplausos.mp3')
                         pygame.display.flip()
-                        acertos++
+                        acertos += 1
                     else:
                         DISPLAYSURF.fill(BGCOLOR)
                         DISPLAYSURF.blit(IMAGESDICT['incorreto'], (30,50))
