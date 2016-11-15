@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 #!/usr/bin/python
 # -*- coding: ascii -*-
+
+#importanto as bibliotecas necessárias para o funcionamento do jogo
 import random
 from random import randrange
 import sys
@@ -12,13 +14,22 @@ import pygame
 from pygame.locals import *
 from pygame import mixer
 
-#sons do jogo
+#aqui inicializamos o mixer para tocar as músicas
 mixer.init()
 os.getcwd()
 game_music = mixer.Sound("letyourbodymove.ogg")
 
-INSTRUCTIONSDICT = { }
+#dicionario sonoro de instrucoes
+INSTRUCTIONSDICT = {
+    'titulo': 'BCM.mp3',
+    'intro': 'intro.mp3',
+    'botao_avancar_sound': 'botao_avancar.mp3',
+    'certo': 'aplausos.mp3',
+    'erro': 'erro.mp3',
+    'incorreto': 'tente_novamente.mp3'
+}
 
+#dicionario sonoro dos numeros e operacoes
 SOUNDSDICT = {
     '1': 'Número_1.mp3',
     '2': 'Número_2.mp3',
@@ -34,12 +45,13 @@ SOUNDSDICT = {
     '*': 'Vezes.mp3'
 }
 
-#tratando eventos do Arduino
+#tratando eventos do usuario lidos pelo Arduino
 BOTAO_AVANCAR = USEREVENT + 1
 BOTAO_SAIR = USEREVENT + 2
 BOTAO_RETORNAR = USEREVENT + 3
 CARD = USEREVENT + 1
 
+#dicionario das tags RFID
 CARDSDICT = {
     'Card UID: 64 35 15 B8': '2',
     'Card UID: 5A 43 06 4C': '3',
@@ -59,11 +71,11 @@ class SerialThread (threading.Thread):
         threading.Thread.__init__(self)
         self.setDaemon(True)
     def run (self):
+        #aqui criamos a thread que permite que a leitura dos cartões ao mesmo tempo em que o jogo esta rodando
         ser = serial.Serial('/dev/ttyACM0', 9600, timeout = 1)
         while 1 :
             value = ser.readline().strip()
             if value:
-                print(value)
                 event_type = USEREVENT
                 if value == "botao_avancar":
                     event_type = BOTAO_AVANCAR
@@ -71,6 +83,8 @@ class SerialThread (threading.Thread):
                     event_type = BOTAO_SAIR
                 if value == "botao_retornar":
                     event_type = BOTAO_RETORNAR
+                if value == "botao_repetir":
+                    event_type = BOTAO_REPETIR
                 elif 'Card' in value:
                     event_type = CARD
 
@@ -78,14 +92,12 @@ class SerialThread (threading.Thread):
                 pygame.event.post(event)
                 print("raised event_type = " + str(event_type) + " code = " + value)
 
+#tamanhos das telas
 FPS = 30
 WINWIDTH = 700
 WINHEIGHT = 600
 HALF_WINWIDTH = int(WINWIDTH / 2)
 HALF_WINHEIGHT = int(WINHEIGHT / 2)
-OUTSIDE_DECORATION_PCT = 20
-
-# The total width and height of each tile in pixels.
 TILEWIDTH = 50
 TILEHEIGHT = 85
 TILEFLOORHEIGHT = 40
@@ -97,11 +109,15 @@ TEXTCOLOR = WHITE
 
 
 def main():
-    numeros = [2, 3, 4, 5, 6, 7, 8, 9];
-    random_index = randrange(0,len(numeros))
-    print numeros[random_index]
     global FPSCLOCK, DISPLAYSURF, IMAGESDICT, TILEMAPPING, OUTSIDEDECOMAPPING, BASICFONT, PLAYERIMAGES, game_music, random_index
 
+    #sorteio do level_two para deixar a random_index como variavel global
+    numeros = [2, 3, 4, 5, 6, 7, 8, 9];
+    random_index = randrange(0,len(numeros))
+    a = randrange(2, len(numeros))
+    b = randrange(2, len(numeros))
+
+    acertos = 0
     pygame.init()
     pygame.font.init()
     FPSCLOCK = pygame.time.Clock()
@@ -124,20 +140,23 @@ def main():
         'horngirl': pygame.image.load('horngirl.png'),
         'pinkgirl': pygame.image.load('pinkgirl.png')}
 
-    startScreen()  # show the title screen until the user presses a key
+    startScreen()  #mainScreen espera o usuario apertar o botao_avancar para chamar a startScreen, tela inicial
 
 
 def startScreen():
     titleRect = IMAGESDICT['title'].get_rect()
-    topCoord = 50  # topCoord tracks where to position the top of the text
+    topCoord = 50  # posiciona o topo do texto
     titleRect.top = topCoord
     titleRect.centerx = HALF_WINWIDTH
     topCoord += titleRect.height
 
     game_music.set_volume(0.3)
     game_music.play()
-    instructionText = ['Aprenda Matematica de um jeito mais divertido!']
-
+    #play('BCM.mp3')
+    instructionText = ['Aprenda Matematica de um jeito mais divertido!',
+                       'Aperte os botoes para jogar']
+    #play('intro.mp3')
+    #play('botao_avancar.mp3')
     DISPLAYSURF.fill(BGCOLOR)
 
     DISPLAYSURF.blit(IMAGESDICT['title'], titleRect)
@@ -156,10 +175,7 @@ def startScreen():
             if event.type == BOTAO_SAIR:
                 terminate()
             elif event.type == BOTAO_AVANCAR:
-                #if event.key == K_SPACE:
                 level_one()
-            elif event.type == K_n:
-                level_two()
             elif event.type == KEYDOWN:
                 if event.key == K_ESCAPE:
                     terminate()
@@ -177,10 +193,12 @@ def level_one():
     instructionText = myfont.render('Vamos brincar com Matematica!', 1, (WHITE))
     DISPLAYSURF.blit(instructionText, (50, 0))
 
+    #variaveis para ajustar os dados na tela
     x = 20
     y = 60
 
-    while True:  # Main loop for the start screen.
+    while True:
+        #while acertos < 5 # lop principal para o level_one.
         for event in pygame.event.get():
             if event.type == BOTAO_SAIR:
                 terminate()
@@ -192,24 +210,30 @@ def level_one():
                 label = myfont.render(CARDSDICT[key], 1, (255,255,255))
                 DISPLAYSURF.blit(label, (x,y))
                 x = x + 100
+                #if event.type == BOTAO_REPETIR:
+                #    playSound(value)
                 if len(LISTA_NUMEROS) == 5:
                     if check_expression(LISTA_NUMEROS):
                         if calculate(LISTA_NUMEROS):
                             DISPLAYSURF.fill(BGCOLOR)
                             DISPLAYSURF.blit(IMAGESDICT['resolvido'], (30,50))
+                            #playSound('aplausos.mp3')
                             pygame.display.flip()
+                            acertos++
                         else:
                             DISPLAYSURF.fill(BGCOLOR)
                             DISPLAYSURF.blit(IMAGESDICT['incorreto'], (30,50))
+                            #playSound('erro.mp3')
+                            #playSound('tente_novamente.mp3')
                             pygame.display.flip()
                         LISTA_NUMEROS = []
+                        acertos = 0
                     else:
                         instructionText = myfont.render('Expressão mal formada, tente novamente!', 1, (WHITE))
                         DISPLAYSURF.blit(instructionText, (50, 0))
             elif event.type == BOTAO_RETORNAR:
                 mainScreen()
-                return  # user has pressed a key, so return.
-
+                return  # usuario apertou retornar para tela principal.
         pygame.display.update()
         FPSCLOCK.tick()
 
@@ -225,7 +249,8 @@ def level_two():
     x = 20
     y = 60
 
-    while True:  # Loop principal para a tela atual
+    while True:  # Loop principal para a tela level_two
+        #while acertos < 5 # lop principal para o level_one.
         for event in pygame.event.get():
             if event.type == BOTAO_SAIR:
                 terminate()
@@ -242,22 +267,82 @@ def level_two():
                         if calculate_op(LISTA_NUMEROS):
                             DISPLAYSURF.fill(BGCOLOR)
                             DISPLAYSURF.blit(IMAGESDICT['resolvido'], (30,50))
+                            #label = myfont.render(" ", 1, (255,255,255))
+                            #playSound('aplausos.mp3')
                             pygame.display.flip()
+                            acertos++
                         else:
                             DISPLAYSURF.fill(BGCOLOR)
                             DISPLAYSURF.blit(IMAGESDICT['incorreto'], (30,50))
+                            #label = myfont.render(" ", 1, (255,255,255))
+                            #playSound('erro.mp3')
+                            #playSound('tente_novamente.mp3')
                             pygame.display.flip()
                         LISTA_NUMEROS = []
+                        acertos = 0
                     else:
                         instructionText = myfont.render('Expressão mal formada, tente novamente!', 1, (WHITE))
                         DISPLAYSURF.blit(instructionText, (50, 0))
             elif event.type == BOTAO_RETORNAR:
                 level_one()
-                return  # user has pressed a key, so return.
+                return  # usuario retorna para level_one
 
         pygame.display.update()
         FPSCLOCK.tick()
 
+def level_three():
+    DISPLAYSURF.fill(BGCOLOR)
+    myfont = pygame.font.SysFont('freesansbold.ttf', 45)
+    instructionText = myfont.render('Qual o valor de x?', 1, (WHITE))
+    instructionText = myfont.render("x + ", a, " = ", b, 1, (WHITE))
+    DISPLAYSURF.blit(instructionText, (50, 0))
+
+    x = 20
+    y = 60
+
+    #print "x + ", x, " = ", y
+    #resultado = input("valor de x: ")
+
+
+        while True:  # Loop principal para a tela nivel_three
+        #while acertos < 5:
+            for event in pygame.event.get():
+                if event.type == BOTAO_SAIR:
+                    terminate()
+                elif event.type == CARD:
+                    key = event.code
+                    value = CARDSDICT[key]
+                    playSound(value)
+                    LISTA_NUMEROS.append(value)
+                    label = myfont.render(CARDSDICT[key], 1, (255,255,255))
+                    DISPLAYSURF.blit(label, (x,y))
+                    x = x + 100
+                    if calculate_equacao(a, b, resultado):
+                        DISPLAYSURF.fill(BGCOLOR)
+                        DISPLAYSURF.blit(IMAGESDICT['resolvido'], (30,50))
+                        #label = myfont.render(" ", 1, (255,255,255))
+                        #playSound('aplausos.mp3')
+                        pygame.display.flip()
+                        acertos++
+                    else:
+                        DISPLAYSURF.fill(BGCOLOR)
+                        DISPLAYSURF.blit(IMAGESDICT['incorreto'], (30,50))
+                        #label = myfont.render(" ", 1, (255,255,255))
+                        #playSound('erro.mp3')
+                        #playSound('tente_novamente.mp3')
+                        pygame.display.flip()
+                acertos = 0
+                else:
+                    instructionText = myfont.render('Expressão mal formada, tente novamente!', 1, (WHITE))
+                    DISPLAYSURF.blit(instructionText, (50, 0))
+        elif event.type == BOTAO_RETORNAR:
+            level_two()
+            return  # usuario retorna para level_one
+
+    pygame.display.update()
+    FPSCLOCK.tick()
+
+# aqui o jogo verifica se a operacao foi feita na ordem certa
 def check_expression(LISTA_NUMEROS):
     return (LISTA_NUMEROS[0].isdigit()
     and (LISTA_NUMEROS[1] == '+' or LISTA_NUMEROS[1] == '*')
@@ -265,6 +350,7 @@ def check_expression(LISTA_NUMEROS):
     and LISTA_NUMEROS[4].isdigit()
     and LISTA_NUMEROS[3] == '=')
 
+#esta funcao calcula a operacao do level_one
 def calculate(LISTA_NUMEROS):
     num_1 = int(LISTA_NUMEROS[0])
     operacao = LISTA_NUMEROS[1]
@@ -286,7 +372,7 @@ def calculate(LISTA_NUMEROS):
     else:
         return False
 
-
+#esta calcula do level_two
 def calculate_op():
     num_1 = int(LISTA_NUMEROS[0])
     operacao = LISTA_NUMEROS[1]
@@ -309,11 +395,25 @@ def calculate_op():
     else:
         return False
 
+
+def calculate_equacao(a, b, resultado):
+    resultado_certo = b - a
+
+    if resultado_certo == resultado:
+        return True
+    else:
+        return False
+
+
 def playSound(value):
     if SOUNDSDICT.has_key(value):
         value = SOUNDSDICT[value]
         play_sound(value)
+#    else if INSTRUCTIONSDICT.has_key(value):
+#        value = INSTRUCTIONSDICT[value]
+#        play_sound(value)
 
+#metodo para acessar os arquivos mp3 da pasta
 def play_sound(path):
     canonicalized_path = path.replace('/', os.sep).replace('\\', os.sep)
     pygame.mixer.music.load(canonicalized_path)
