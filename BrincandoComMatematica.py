@@ -60,17 +60,17 @@ PINK = (220, 20, 60)
 WHITE = (255, 255, 255)
 BGCOLOR = PINK
 TEXTCOLOR = WHITE
+ACERTOS = 0
 
 
 def main():
-    global FPSCLOCK, DISPLAYSURF, IMAGESDICT, TILEMAPPING, OUTSIDEDECOMAPPING, BASICFONT, PLAYERIMAGES
+    global FPSCLOCK, DISPLAYSURF, IMAGESDICT, TILEMAPPING, BASICFONT
 
     pygame.init()
     pygame.font.init()
     FPSCLOCK = pygame.time.Clock()
 
     SerialThread().start()
-
     DISPLAYSURF = pygame.display.set_mode((WINWIDTH, WINHEIGHT))
 
     pygame.display.set_caption("Brincando com Matemática")
@@ -127,30 +127,27 @@ def start_screen():
         FPSCLOCK.tick()
 
 
-def level_one():
-
-    print("level_one")
-    # Tela que checa resultado da operacao escolhida pelo usuario
+def level_one(): # Tela que checa resultado da operacao escolhida pelo usuario
+    global ACERTOS
     DISPLAYSURF.fill(BGCOLOR)
     LISTA_NUMEROS = []
     myfont = pygame.font.SysFont('freesansbold.ttf', 45)
-    instructionText = myfont.render(
-        'Vamos brincar com Matematica!', 1, (WHITE))
+    instructionText = myfont.render('Vamos brincar com Matematica!', 1, (WHITE))
     DISPLAYSURF.blit(instructionText, (50, 0))
 
     # variaveis para ajustar os dados na tela
     x = 20
     y = 60
-    acertos = 0
 
     while True:
-        if acertos > 5:
+        if ACERTOS > 1:
+            ACERTOS = 0
             level_two()
         for event in pygame.event.get():
             if event.type == KEYDOWN:
                 if event.key == K_l:
                     terminate()
-                if event.key == K_b:
+                if event.key == K_n:
                     level_one()
             elif event.type == CARD:
                 key = event.code
@@ -164,11 +161,11 @@ def level_one():
                     if check_expression(LISTA_NUMEROS):
                         if calculate(LISTA_NUMEROS):
                             DISPLAYSURF.fill(BGCOLOR)
-                            DISPLAYSURF.blit(
-                                IMAGESDICT['resolvido'], (80, 100))
+                            DISPLAYSURF.blit(IMAGESDICT['resolvido'], (80, 100))
                             play_sound('certo')
                             pygame.display.flip()
-                            acertos += 1
+                            ACERTOS += 1
+                            print(ACERTOS)
                         else:
                             DISPLAYSURF.fill(BGCOLOR)
                             DISPLAYSURF.blit(IMAGESDICT['incorreto'], (30, 50))
@@ -192,8 +189,7 @@ def level_two():
     DISPLAYSURF.fill(BGCOLOR)
     myfont = pygame.font.SysFont('freesansbold.ttf', 45)
     LISTA_NUMEROS = []
-    instructionText = myfont.render(
-        'Qual operacao voce consegue chegar no seguinte resultado?', 1, (WHITE))
+    instructionText = myfont.render('Qual operacao voce consegue chegar no seguinte resultado?', 1, (WHITE))
     instructionText = myfont.render(random_index, 1, (WHITE))
     DISPLAYSURF.blit(instructionText, (50, 0))
 
@@ -201,7 +197,7 @@ def level_two():
     y = 60
 
     while True:
-        # if acertos > 5:
+        # if ACERTOS > 5:
         #    level_three()
         for event in pygame.event.get():
             if event.type == KEYDOWN:
@@ -224,7 +220,7 @@ def level_two():
                             DISPLAYSURF.blit(IMAGESDICT['resolvido'], (30, 50))
                             play_sound('certo')
                             pygame.display.flip()
-                            acertos += 1
+                            ACERTOS += 1
                         else:
                             DISPLAYSURF.fill(BGCOLOR)
                             DISPLAYSURF.blit(IMAGESDICT['incorreto'], (30, 50))
