@@ -165,8 +165,8 @@ def startScreen():
 
     while True:  # Main loop for the start screen.
         for event in pygame.event.get():
-            #if event.type == BOTAO_SAIR:
-            #    terminate()
+            if event.type == BOTAO_SAIR:
+                terminate()
             if event.type == KEYDOWN:
                 if event.key == K_n:
                     level_one()
@@ -191,13 +191,13 @@ def level_one():
     y = 60
 
     while True:
-        if acertos > 5:
+        if acertos > 2:
             level_two()
         for event in pygame.event.get():
-            if event.type == KEYDOWN:
-                if event.key == K_l:
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_l:
                     terminate()
-                if event.key == K_b:
+                if event.key == pygame.K_n:
                     level_one()
             elif event.type == CARD:
                 key = event.code
@@ -214,7 +214,8 @@ def level_one():
                             DISPLAYSURF.blit(IMAGESDICT['resolvido'], (80,100))
                             playSound('certo')
                             pygame.display.flip()
-                            acertos += 1
+                            acertos = acertos + 1
+                            print(acertos)
                         else:
                             DISPLAYSURF.fill(BGCOLOR)
                             DISPLAYSURF.blit(IMAGESDICT['incorreto'], (30,50))
@@ -228,9 +229,9 @@ def level_one():
             elif event.type == BOTAO_RETORNAR:
                 mainScreen()
                 return
-    acertos = 0
-    pygame.display.update()
-    FPSCLOCK.tick()
+        acertos = 0
+        pygame.display.update()
+        FPSCLOCK.tick()
 
 
 def level_two():
