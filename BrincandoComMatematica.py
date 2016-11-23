@@ -23,7 +23,7 @@ game_music = mixer.Sound("resources/sounds/letyourbodymove.ogg")
 BOTAO_AVANCAR = USEREVENT + 1
 BOTAO_SAIR = USEREVENT + 2
 BOTAO_RETORNAR = USEREVENT + 3
-CARD = USEREVENT + 1
+CARD = USEREVENT + 4
 
 # dicionario das tags RFID
 CARDSDICT = {
@@ -45,36 +45,6 @@ numeros = [2, 3, 4, 5, 6, 7, 8, 9]
 random_index = randrange(0, len(numeros))
 a = randrange(2, len(numeros))
 b = randrange(2, len(numeros))
-acertos = 0
-
-
-class SerialThread (threading.Thread):
-
-    def __init__(self):
-        threading.Thread.__init__(self)
-        self.setDaemon(True)
-
-    def run(self):
-        # aqui criamos a thread que permite que a leitura dos cartões ao mesmo
-        # tempo em que o jogo esta rodando
-        ser = serial.Serial('/dev/ttyACM0', 9600, timeout=1)
-        while 1:
-            value = ser.readline().strip()
-            if value:
-                event_type = USEREVENT
-                if value == "botao_avancar":
-                    event_type = BOTAO_AVANCAR
-                if value == "botao_sair":
-                    event_type = BOTAO_SAIR
-                if value == "botao_retornar":
-                    event_type = BOTAO_RETORNAR
-                elif 'Card' in value:
-                    event_type = CARD
-
-                event = pygame.event.Event(event_type, code=value)
-                pygame.event.post(event)
-                print("raised event_type = " +
-                      str(event_type) + " code = " + value)
 
 # tamanhos das telas
 FPS = 30
@@ -113,10 +83,11 @@ def main():
         'incorreto': pygame.image.load('resources/images/TEM_CERTEZA.png')
     }
 
-    startScreen()  # mainScreen espera o usuario apertar o botao_avancar para chamar a startScreen
+    start_screen()  # mainScreen espera o usuario apertar o botao_avancar para chamar a start_screen
 
 
-def startScreen():
+def start_screen():
+    print("start_screen")
     titleRect = IMAGESDICT['title'].get_rect()
     topCoord = 60  # posiciona o topo do texto
     titleRect.top = topCoord
@@ -127,8 +98,8 @@ def startScreen():
     game_music.play()
     instructionText = ['Aprenda Matematica de um jeito mais divertido!',
                        'Aperte os botoes para jogar']
-    playSound('titulo')
-    playSound('botao_avancar_sound')
+    play_sound('titulo')
+    play_sound('botao_avancar_sound')
     DISPLAYSURF.fill(BGCOLOR)
 
     DISPLAYSURF.blit(IMAGESDICT['title'], titleRect)
@@ -144,13 +115,12 @@ def startScreen():
         DISPLAYSURF.blit(instSurf, instRect)
 
     while True:  # Main loop for the start screen.
-        for event in pygame.event.get():
-            # if event.type == BOTAO_SAIR:
-            #    terminate()
-            if event.type == KEYDOWN:
-                if event.key == K_n:
+        events = pygame.event.get()
+        for event in events:
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_n:
                     level_one()
-                if event.key == K_l:
+                if event.key == pygame.K_l:
                     terminate()
 
         pygame.display.update()
@@ -158,11 +128,12 @@ def startScreen():
 
 
 def level_one():
+
+    print("level_one")
     # Tela que checa resultado da operacao escolhida pelo usuario
     DISPLAYSURF.fill(BGCOLOR)
     LISTA_NUMEROS = []
     myfont = pygame.font.SysFont('freesansbold.ttf', 45)
-    acertos = 0
     instructionText = myfont.render(
         'Vamos brincar com Matematica!', 1, (WHITE))
     DISPLAYSURF.blit(instructionText, (50, 0))
@@ -170,10 +141,10 @@ def level_one():
     # variaveis para ajustar os dados na tela
     x = 20
     y = 60
+    acertos = 0
 
     while True:
         if acertos > 5:
-            acertos = 0
             level_two()
         for event in pygame.event.get():
             if event.type == KEYDOWN:
@@ -184,7 +155,7 @@ def level_one():
             elif event.type == CARD:
                 key = event.code
                 value = CARDSDICT[key]
-                playSound(value)
+                play_sound(value)
                 LISTA_NUMEROS.append(value)
                 label = myfont.render(CARDSDICT[key], 1, (255, 255, 255))
                 DISPLAYSURF.blit(label, (x, y))
@@ -195,14 +166,14 @@ def level_one():
                             DISPLAYSURF.fill(BGCOLOR)
                             DISPLAYSURF.blit(
                                 IMAGESDICT['resolvido'], (80, 100))
-                            playSound('certo')
+                            play_sound('certo')
                             pygame.display.flip()
                             acertos += 1
                         else:
                             DISPLAYSURF.fill(BGCOLOR)
                             DISPLAYSURF.blit(IMAGESDICT['incorreto'], (30, 50))
-                            playSound('erro')
-                            playSound('incorreto')
+                            play_sound('erro')
+                            play_sound('incorreto')
                             pygame.display.flip()
                         LISTA_NUMEROS = []
                     else:
@@ -212,11 +183,12 @@ def level_one():
             elif event.type == BOTAO_RETORNAR:
                 mainScreen()
                 return
-    pygame.display.update()
-    FPSCLOCK.tick()
+        pygame.display.update()
+        FPSCLOCK.tick()
 
 
 def level_two():
+    print("level_two")
     DISPLAYSURF.fill(BGCOLOR)
     myfont = pygame.font.SysFont('freesansbold.ttf', 45)
     LISTA_NUMEROS = []
@@ -240,7 +212,7 @@ def level_two():
             elif event.type == CARD:
                 key = event.code
                 value = CARDSDICT[key]
-                playSound(value)
+                play_sound(value)
                 LISTA_NUMEROS.append(value)
                 label = myfont.render(CARDSDICT[key], 1, (255, 255, 255))
                 DISPLAYSURF.blit(label, (x, y))
@@ -250,14 +222,14 @@ def level_two():
                         if calculate_op(LISTA_NUMEROS):
                             DISPLAYSURF.fill(BGCOLOR)
                             DISPLAYSURF.blit(IMAGESDICT['resolvido'], (30, 50))
-                            playSound('certo')
+                            play_sound('certo')
                             pygame.display.flip()
                             acertos += 1
                         else:
                             DISPLAYSURF.fill(BGCOLOR)
                             DISPLAYSURF.blit(IMAGESDICT['incorreto'], (30, 50))
-                            playSound('erro')
-                            playSound('incorreto')
+                            play_sound('erro')
+                            play_sound('incorreto')
                             pygame.display.flip()
                         LISTA_NUMEROS = []
                     else:
@@ -369,7 +341,7 @@ SOUNDSDICT = {
 }
 
 
-def playSound(value):
+def play_sound(value):
     if SOUNDSDICT.has_key(value):
         value = SOUNDSDICT[value]
         play_sound(value)
@@ -379,8 +351,8 @@ def playSound(value):
 
 
 # metodo para acessar os arquivos mp3 da pasta
-def play_sound(path):
-    path = "resources/sounds/" + path
+def play(path):
+    path = "/resources/sounds/" + path
     canonicalized_path = path.replace('/', os.sep).replace('\\', os.sep)
     pygame.mixer.music.load(canonicalized_path)
     pygame.mixer.music.set_volume(1.0)
@@ -390,6 +362,37 @@ def play_sound(path):
 def terminate():
     pygame.quit()
     sys.exit()
+
+# serial reading
+
+class SerialThread (threading.Thread):
+
+    def __init__(self):
+        threading.Thread.__init__(self)
+        self.setDaemon(True)
+
+    def run(self):
+        # aqui criamos a thread que permite que a leitura dos cartões ao mesmo
+        # tempo em que o jogo esta rodando
+        ser = serial.Serial('/dev/ttyACM0', 9600, timeout=1)
+        while 1:
+            value = ser.readline().strip()
+            if value:
+                event_type = USEREVENT
+                if value == "botao_avancar":
+                    event_type = BOTAO_AVANCAR
+                if value == "botao_sair":
+                    event_type = BOTAO_SAIR
+                if value == "botao_retornar":
+                    event_type = BOTAO_RETORNAR
+                elif 'Card' in value:
+                    event_type = CARD
+
+                event = pygame.event.Event(event_type, code=value)
+                pygame.event.post(event)
+                print("raised event_type = " +
+                      str(event_type) + " code = " + value)
+
 
 if __name__ == '__main__':
     main()
