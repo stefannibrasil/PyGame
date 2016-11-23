@@ -17,33 +17,7 @@ from pygame import mixer
 #aqui inicializamos o mixer para tocar as músicas
 mixer.init()
 os.getcwd()
-game_music = mixer.Sound("letyourbodymove.ogg")
-
-#dicionario sonoro de instrucoes
-INSTRUCTIONSDICT = {
-    'titulo': 'BCM.mp3',
-    'intro': 'intro.mp3',
-    'botao_avancar_sound': 'botao_avancar.mp3',
-    'certo': 'aplausos.mp3',
-    'erro': 'erro.mp3',
-    'incorreto': 'tente_novamente.mp3'
-}
-
-#dicionario sonoro dos numeros e operacoes
-SOUNDSDICT = {
-    '1': 'Número_1.mp3',
-    '2': 'Número_2.mp3',
-    '3': 'Número_3.mp3',
-    '4': 'Número_4.mp3',
-    '5': 'Número_5.mp3',
-    '6': 'Número_6.mp3',
-    '7': 'Número_7.mp3',
-    '8': 'Número_8.mp3',
-    '9': 'Número_9.mp3',
-    '=': 'Igual_a.mp3',
-    '+': 'Mais.mp3',
-    '*': 'Vezes.mp3'
-}
+game_music = mixer.Sound("resources/sounds/letyourbodymove.ogg")
 
 #tratando eventos do usuario lidos pelo Arduino
 BOTAO_AVANCAR = USEREVENT + 1
@@ -128,10 +102,11 @@ def main():
     BASICFONT = pygame.font.Font('freesansbold.ttf', 18)
 
     IMAGESDICT = {
-        'title': pygame.image.load('bcm_title.png'),
-        'resolvido': pygame.image.load('resolvido.png'),
-        'desafio': pygame.image.load('ORDEM.png'),
-        'incorreto': pygame.image.load('TEM_CERTEZA.png'),}
+        'title': pygame.image.load('resources/images/bcm_title.png'),
+        'resolvido': pygame.image.load('resources/images/resolvido.png'),
+        'desafio': pygame.image.load('resources/images/ORDEM.png'),
+        'incorreto': pygame.image.load('resources/images/TEM_CERTEZA.png')
+    }
 
     startScreen()  #mainScreen espera o usuario apertar o botao_avancar para chamar a startScreen
 
@@ -351,6 +326,34 @@ def calculate_equacao(a, b, value):
         return False
 
 
+# sounds
+
+#dicionario sonoro de instrucoes
+INSTRUCTIONSDICT = {
+    'titulo': 'BCM.mp3',
+    'intro': 'intro.mp3',
+    'botao_avancar_sound': 'botao_avancar.mp3',
+    'certo': 'aplausos.mp3',
+    'erro': 'erro.mp3',
+    'incorreto': 'tente_novamente.mp3'
+}
+
+#dicionario sonoro dos numeros e operacoes
+SOUNDSDICT = {
+    '1': 'Número_1.mp3',
+    '2': 'Número_2.mp3',
+    '3': 'Número_3.mp3',
+    '4': 'Número_4.mp3',
+    '5': 'Número_5.mp3',
+    '6': 'Número_6.mp3',
+    '7': 'Número_7.mp3',
+    '8': 'Número_8.mp3',
+    '9': 'Número_9.mp3',
+    '=': 'Igual_a.mp3',
+    '+': 'Mais.mp3',
+    '*': 'Vezes.mp3'
+}
+
 def playSound(value):
     if SOUNDSDICT.has_key(value):
         value = SOUNDSDICT[value]
@@ -362,6 +365,7 @@ def playSound(value):
 
 #metodo para acessar os arquivos mp3 da pasta
 def play_sound(path):
+    path = "resources/sounds/" + path
     canonicalized_path = path.replace('/', os.sep).replace('\\', os.sep)
     pygame.mixer.music.load(canonicalized_path)
     pygame.mixer.music.set_volume(1.0)
