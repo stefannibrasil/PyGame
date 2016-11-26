@@ -15,7 +15,7 @@ from pygame.locals import *
 from pygame import mixer
 
 # aqui inicializamos o mixer para tocar as músicas
-mixer.init()
+pygame.mixer.init(channels = 4)
 os.getcwd()
 game_music = mixer.Sound("resources/sounds/letyourbodymove.ogg")
 
@@ -42,14 +42,14 @@ CARDSDICT = {
 
 # sorteio do level_two para deixar a random_index como variavel global
 numeros = [2, 3, 4, 5, 6, 7, 8, 9]
-random_index = randrange(0, len(numeros))
+random_index = randrange(2, len(numeros))
 a = randrange(2, len(numeros))
 b = randrange(2, len(numeros))
 
 # tamanhos das telas
 FPS = 30
-WINWIDTH = 900
-WINHEIGHT = 800
+WINWIDTH = 1100
+WINHEIGHT = 900
 HALF_WINWIDTH = int(WINWIDTH / 2)
 HALF_WINHEIGHT = int(WINHEIGHT / 2)
 TILEWIDTH = 50
@@ -87,7 +87,6 @@ def main():
 
 
 def start_screen():
-    print("start_screen")
     titleRect = IMAGESDICT['title'].get_rect()
     topCoord = 60  # posiciona o topo do texto
     titleRect.top = topCoord
@@ -117,7 +116,11 @@ def start_screen():
     while True:  # Main loop for the start screen.
         events = pygame.event.get()
         for event in events:
-            if event.type == pygame.KEYDOWN:
+            if event.type == BOTAO_AVANCAR:
+                level_one()
+            elif event.type == BOTAO_SAIR:
+                terminate()
+            elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_n:
                     level_one()
                 if event.key == pygame.K_l:
@@ -129,22 +132,39 @@ def start_screen():
 
 def level_one(): # Tela que checa resultado da operacao escolhida pelo usuario
     global ACERTOS
+    topCoord = 60  # posiciona o topo do texto
     DISPLAYSURF.fill(BGCOLOR)
     LISTA_NUMEROS = []
     myfont = pygame.font.SysFont('freesansbold.ttf', 45)
-    instructionText = myfont.render('Vamos brincar com Matematica!', 1, (WHITE))
-    DISPLAYSURF.blit(instructionText, (50, 0))
+    instructionText = ['Vamos brincar com Matematica!',
+                       'Forme operacoes e veja se seu resultado esta correto']
+    play_sound('fase1')
+    # posicionando as instrucoes na tela
+    for i in range(len(instructionText)):
+        instSurf = BASICFONT.render(instructionText[i], 1, TEXTCOLOR)
+        instRect = instSurf.get_rect()
+        topCoord += 5  # 10 pixels will go in between each line of text.
+        instRect.top = topCoord
+        instRect.centerx = HALF_WINWIDTH
+        topCoord += instRect.height  # Adjust for the height of the line.
+        DISPLAYSURF.blit(instSurf, instRect)
 
     # variaveis para ajustar os dados na tela
-    x = 20
-    y = 60
+    x = 40
+    y = 180
 
     while True:
         if ACERTOS > 1:
             ACERTOS = 0
             level_two()
         for event in pygame.event.get():
-            if event.type == KEYDOWN:
+            if event.type == BOTAO_RETORNAR:
+                start_screen()
+            elif event.type == BOTAO_AVANCAR:
+                level_one()
+            elif event.type == BOTAO_SAIR:
+                terminate()
+            elif event.type == KEYDOWN:
                 if event.key == K_l:
                     terminate()
                 if event.key == K_n:
@@ -160,13 +180,15 @@ def level_one(): # Tela que checa resultado da operacao escolhida pelo usuario
                 if len(LISTA_NUMEROS) == 5:
                     if check_expression(LISTA_NUMEROS):
                         if calculate(LISTA_NUMEROS):
+                            play_sound(value)
                             DISPLAYSURF.fill(BGCOLOR)
-                            DISPLAYSURF.blit(IMAGESDICT['resolvido'], (80, 100))
+                            DISPLAYSURF.blit(IMAGESDICT['resolvido'], (150, 150))
                             play_sound('certo')
                             pygame.display.flip()
                             ACERTOS += 1
                             print(ACERTOS)
                         else:
+                            play_sound(value)
                             DISPLAYSURF.fill(BGCOLOR)
                             DISPLAYSURF.blit(IMAGESDICT['incorreto'], (30, 50))
                             play_sound('erro')
@@ -174,8 +196,8 @@ def level_one(): # Tela que checa resultado da operacao escolhida pelo usuario
                             pygame.display.flip()
                         LISTA_NUMEROS = []
                     else:
-                        instructionText = myfont.render(
-                            'Expressão mal formada, tente novamente!', 1, (WHITE))
+                        instructionText = myfont.render('Expressão mal formada, tente novamente!', 1, (WHITE))
+                        play_sound('expressao_mal_formada')
                         DISPLAYSURF.blit(instructionText, (50, 0))
             elif event.type == BOTAO_RETORNAR:
                 mainScreen()
@@ -185,21 +207,38 @@ def level_one(): # Tela que checa resultado da operacao escolhida pelo usuario
 
 
 def level_two():
-    global random_index
+    global random_index, ACERTOS
+    topCoord = 60  # posiciona o topo do texto
     DISPLAYSURF.fill(BGCOLOR)
     myfont = pygame.font.SysFont('freesansbold.ttf', 45)
     LISTA_NUMEROS = []
-    instructionText = myfont.render('Qual operacao voce consegue chegar no seguinte resultado?', 1, (WHITE))
-    instructionText = myfont.render(random_index, 1, (WHITE))
-    DISPLAYSURF.blit(instructionText, (50, 0))
+    instructionText = ['Como voce consegue chegar no seguinte resultado?',
+                       str(random_index)]
+    play_sound('fase2')
+    play_sound(str(random_index))
+    # posicionando as instrucoes na tela
+    for i in range(len(instructionText)):
+        instSurf = BASICFONT.render(instructionText[i], 1, TEXTCOLOR)
+        instRect = instSurf.get_rect()
+        topCoord += 5  # 10 pixels will go in between each line of text.
+        instRect.top = topCoord
+        instRect.centerx = HALF_WINWIDTH
+        topCoord += instRect.height  # Adjust for the height of the line.
+        DISPLAYSURF.blit(instSurf, instRect)
 
-    x = 20
-    y = 60
+    x = 40
+    y = 140
 
     while True:
-        # if ACERTOS > 5:
-        #    level_three()
+        if ACERTOS > 1:
+           level_three()
         for event in pygame.event.get():
+            if event.type == BOTAO_RETORNAR:
+                start_screen()
+            elif event.type == BOTAO_AVANCAR:
+                level_two()
+            elif event.type == BOTAO_SAIR:
+                terminate()
             if event.type == KEYDOWN:
                 if event.key == K_l:
                     terminate()
@@ -217,7 +256,7 @@ def level_two():
                     if check_expression(LISTA_NUMEROS):
                         if calculate_op(LISTA_NUMEROS):
                             DISPLAYSURF.fill(BGCOLOR)
-                            DISPLAYSURF.blit(IMAGESDICT['resolvido'], (30, 50))
+                            DISPLAYSURF.blit(IMAGESDICT['resolvido'], (50, 60))
                             play_sound('certo')
                             pygame.display.flip()
                             ACERTOS += 1
@@ -229,8 +268,8 @@ def level_two():
                             pygame.display.flip()
                         LISTA_NUMEROS = []
                     else:
-                        instructionText = myfont.render(
-                            'Expressão mal formada, tente novamente!', 1, (WHITE))
+                        instructionText = myfont.render('Expressão mal formada, tente novamente!', 1, (WHITE))
+                        play_sound('expressao_mal_formada')
                         DISPLAYSURF.blit(instructionText, (50, 0))
             elif event.type == BOTAO_RETORNAR:
                 level_one()
@@ -317,7 +356,10 @@ INSTRUCTIONSDICT = {
     'botao_avancar_sound': 'botao_avancar.mp3',
     'certo': 'aplausos.mp3',
     'erro': 'erro.mp3',
-    'incorreto': 'tente_novamente.mp3'
+    'incorreto': 'tente_novamente.mp3',
+    'expressao_mal_formada': 'Expressao_mal_formada.mp3',
+    'fase1': 'fase1.mp3',
+    'fase2': 'fase2.mp3'
 }
 
 # dicionario sonoro dos numeros e operacoes
@@ -348,13 +390,14 @@ def play_sound(value):
 
 # metodo para acessar os arquivos mp3 da pasta
 def play(path):
-    print(path)
     path = "resources/sounds/" + path
     canonicalized_path = path.replace('/', os.sep).replace('\\', os.sep)
-    print(path)
     pygame.mixer.music.load(canonicalized_path)
     pygame.mixer.music.set_volume(1.0)
     pygame.mixer.music.play()
+    #sound = mixer.Sound(canonicalized_path)
+    #channel = mixer.find_channel()
+    #channel.queue(sound)
 
 
 def terminate():
