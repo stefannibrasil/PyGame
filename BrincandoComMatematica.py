@@ -17,7 +17,8 @@ from pygame import mixer
 # aqui inicializamos o mixer para tocar as músicas
 pygame.mixer.init(channels = 4)
 os.getcwd()
-game_music = mixer.Sound("resources/sounds/letyourbodymove.ogg")
+game_music = mixer.Sound("resources/sounds/flight-master-short.wav")
+game_music.play(-1)
 
 # tratando eventos do usuario lidos pelo Arduino
 BOTAO_AVANCAR = USEREVENT + 1
@@ -41,14 +42,14 @@ CARDSDICT = {
 }
 
 # sorteio do level_two para deixar a random_index como variavel global
-numeros = [2, 3, 4, 5, 6, 7, 8, 9]
-random_index = randrange(2, len(numeros))
-a = randrange(2, len(numeros))
-b = randrange(2, len(numeros))
+numeros = [4, 5, 6, 7, 8, 9]
+random_index = random.randint(4, len(numeros))
+a = randrange(4, len(numeros))
+b = randrange(4, len(numeros))
 
 # tamanhos das telas
 FPS = 30
-WINWIDTH = 1100
+WINWIDTH = 1200
 WINHEIGHT = 900
 HALF_WINWIDTH = int(WINWIDTH / 2)
 HALF_WINHEIGHT = int(WINHEIGHT / 2)
@@ -182,7 +183,7 @@ def level_one(): # Tela que checa resultado da operacao escolhida pelo usuario
                         if calculate(LISTA_NUMEROS):
                             play_sound(value)
                             DISPLAYSURF.fill(BGCOLOR)
-                            DISPLAYSURF.blit(IMAGESDICT['resolvido'], (150, 150))
+                            DISPLAYSURF.blit(IMAGESDICT['resolvido'], (150, 170))
                             play_sound('certo')
                             pygame.display.flip()
                             ACERTOS += 1
@@ -190,7 +191,7 @@ def level_one(): # Tela que checa resultado da operacao escolhida pelo usuario
                         else:
                             play_sound(value)
                             DISPLAYSURF.fill(BGCOLOR)
-                            DISPLAYSURF.blit(IMAGESDICT['incorreto'], (30, 50))
+                            DISPLAYSURF.blit(IMAGESDICT['incorreto'], (150, 170))
                             play_sound('erro')
                             play_sound('incorreto')
                             pygame.display.flip()
@@ -231,6 +232,7 @@ def level_two():
 
     while True:
         if ACERTOS > 1:
+           ACERTOS = 0
            level_three()
         for event in pygame.event.get():
             if event.type == BOTAO_RETORNAR:
@@ -256,13 +258,13 @@ def level_two():
                     if check_expression(LISTA_NUMEROS):
                         if calculate_op(LISTA_NUMEROS):
                             DISPLAYSURF.fill(BGCOLOR)
-                            DISPLAYSURF.blit(IMAGESDICT['resolvido'], (50, 60))
+                            DISPLAYSURF.blit(IMAGESDICT['resolvido'], (150, 170))
                             play_sound('certo')
                             pygame.display.flip()
                             ACERTOS += 1
                         else:
                             DISPLAYSURF.fill(BGCOLOR)
-                            DISPLAYSURF.blit(IMAGESDICT['incorreto'], (30, 50))
+                            DISPLAYSURF.blit(IMAGESDICT['incorreto'], (150, 170))
                             play_sound('erro')
                             play_sound('incorreto')
                             pygame.display.flip()
@@ -278,6 +280,74 @@ def level_two():
         pygame.display.update()
         FPSCLOCK.tick()
 
+def level_three():
+    global ACERTOS, a, b
+    topCoord = 60  # posiciona o topo do texto
+    DISPLAYSURF.fill(BGCOLOR)
+    myfont = pygame.font.SysFont('freesansbold.ttf', 45)
+    LISTA_NUMEROS = []
+    instructionText = ['Qual o valor de x?',
+                       'x + str(a) = str(b)']
+    play_sound('fase3')
+    play_sound('x.mp3')
+    play_sound('mais')
+    play_sound(str(a))
+    play_sound('Igual_a')
+    play_sound(str(b))
+    
+    # posicionando as instrucoes na tela
+    for i in range(len(instructionText)):
+        instSurf = BASICFONT.render(instructionText[i], 1, TEXTCOLOR)
+        instRect = instSurf.get_rect()
+        topCoord += 5  # 10 pixels will go in between each line of text.
+        instRect.top = topCoord
+        instRect.centerx = HALF_WINWIDTH
+        topCoord += instRect.height  # Adjust for the height of the line.
+        DISPLAYSURF.blit(instSurf, instRect)
+
+    x = 60
+    y = 180
+
+    while True:  # Loop principal para a tela nivel_three
+        if ACERTOS > 1:
+            start_screen()
+        for event in pygame.event.get():
+            if event.type == BOTAO_RETORNAR:
+                start_screen()
+            elif event.type == BOTAO_AVANCAR:
+                level_three()
+            elif event.type == BOTAO_SAIR:
+                terminate()
+            if event.type == KEYDOWN:
+                if event.key == K_l:
+                    terminate()
+                if event.key == K_n:
+                    level_two()
+            elif event.type == CARD:
+                key = event.code
+                value = CARDSDICT[key]
+                playSound(value)
+                label = myfont.render(CARDSDICT[key], 1, (255,255,255))
+                DISPLAYSURF.blit(label, (x,y))
+                x = x + 100
+                if calculate_equacao(a, b, value):
+                    DISPLAYSURF.fill(BGCOLOR)
+                    DISPLAYSURF.blit(IMAGESDICT['resolvido'], (150, 170))
+                    playSound('certo')
+                    pygame.display.flip()
+                    ACERTOS += 1
+                else:
+                    DISPLAYSURF.fill(BGCOLOR)
+                    DISPLAYSURF.blit(IMAGESDICT['incorreto'], (150, 170))
+                    playSound('erro')
+                    playSound('incorreto')
+                    pygame.display.flip()
+            elif event.type == BOTAO_RETORNAR:
+                level_two()
+                return
+
+        pygame.display.update()
+        FPSCLOCK.tick()
 
 # aqui o jogo verifica se a operacao foi feita na ordem certa
 def check_expression(LISTA_NUMEROS):
@@ -359,7 +429,8 @@ INSTRUCTIONSDICT = {
     'incorreto': 'tente_novamente.mp3',
     'expressao_mal_formada': 'Expressao_mal_formada.mp3',
     'fase1': 'fase1.mp3',
-    'fase2': 'fase2.mp3'
+    'fase2': 'fase2.mp3',
+    'fase3': 'fase3.mp3'
 }
 
 # dicionario sonoro dos numeros e operacoes
@@ -375,7 +446,8 @@ SOUNDSDICT = {
     '9': 'Número_9.mp3',
     '=': 'Igual_a.mp3',
     '+': 'Mais.mp3',
-    '*': 'Vezes.mp3'
+    '*': 'Vezes.mp3',
+    'x': 'x.mp3'
 }
 
 
