@@ -185,7 +185,7 @@ def level_one(): # Tela que checa resultado da operacao escolhida pelo usuario
 
 
 def level_two():
-    print("level_two")
+    global random_index
     DISPLAYSURF.fill(BGCOLOR)
     myfont = pygame.font.SysFont('freesansbold.ttf', 45)
     LISTA_NUMEROS = []
