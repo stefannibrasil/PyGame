@@ -15,10 +15,13 @@ from pygame.locals import *
 from pygame import mixer
 
 # aqui inicializamos o mixer para tocar as músicas
-pygame.mixer.init(channels = 4)
+
+pygame.mixer.pre_init(22050, -16, 2, 4096)
+pygame.mixer.init()
 os.getcwd()
 game_music = mixer.Sound("resources/sounds/flight-master-short.wav")
 game_music.play(-1)
+
 
 # tratando eventos do usuario lidos pelo Arduino
 BOTAO_AVANCAR = USEREVENT + 1
@@ -65,7 +68,7 @@ ACERTOS = 0
 
 
 def main():
-    global FPSCLOCK, DISPLAYSURF, IMAGESDICT, TILEMAPPING, BASICFONT
+    global FPSCLOCK, DISPLAYSURF, IMAGESDICT, SOUNDSDICT, TILEMAPPING, BASICFONT
 
     pygame.init()
     pygame.font.init()
@@ -82,6 +85,31 @@ def main():
         'resolvido': pygame.image.load('resources/images/resolvido.png'),
         'desafio': pygame.image.load('resources/images/ORDEM.png'),
         'incorreto': pygame.image.load('resources/images/TEM_CERTEZA.png')
+    }
+
+    # sounds
+    SOUNDSDICT = {
+        'titulo':                sound_init('BCM.wav'),
+        'intro':                 sound_init('intro.wav'),
+        'botao_avancar_sound':   sound_init('botao_avancar.wav'),
+        'certo':                 sound_init('aplausos.wav'),
+        'erro':                  sound_init('erro.wav'),
+        'incorreto':             sound_init('tente_novamente.wav'),
+        'expressao_mal_formada': sound_init('Expressao_mal_formada.wav'),
+        'fase1':                 sound_init('fase1.wav'),
+        'fase2':                 sound_init('fase2.wav'),
+        '1':                     sound_init('Número_1.wav'),
+        '2':                     sound_init('Número_2.wav'),
+        '3':                     sound_init('Número_3.wav'),
+        '4':                     sound_init('Número_4.wav'),
+        '5':                     sound_init('Número_5.wav'),
+        '6':                     sound_init('Número_6.wav'),
+        '7':                     sound_init('Número_7.wav'),
+        '8':                     sound_init('Número_8.wav'),
+        '9':                     sound_init('Número_9.wav'),
+        '=':                     sound_init('Igual_a.wav'),
+        '+':                     sound_init('Mais.wav'),
+        '*':                     sound_init('Vezes.wav')
     }
 
     start_screen()  # mainScreen espera o usuario apertar o botao_avancar para chamar a start_screen
@@ -131,7 +159,7 @@ def start_screen():
         FPSCLOCK.tick()
 
 
-def level_one(): # Tela que checa resultado da operacao escolhida pelo usuario
+def level_one():  # Tela que checa resultado da operacao escolhida pelo usuario
     global ACERTOS
     topCoord = 60  # posiciona o topo do texto
     DISPLAYSURF.fill(BGCOLOR)
@@ -197,7 +225,8 @@ def level_one(): # Tela que checa resultado da operacao escolhida pelo usuario
                             pygame.display.flip()
                         LISTA_NUMEROS = []
                     else:
-                        instructionText = myfont.render('Expressão mal formada, tente novamente!', 1, (WHITE))
+                        instructionText = myfont.render(
+                            'Expressão mal formada, tente novamente!', 1, (WHITE))
                         play_sound('expressao_mal_formada')
                         DISPLAYSURF.blit(instructionText, (50, 0))
             elif event.type == BOTAO_RETORNAR:
@@ -270,7 +299,8 @@ def level_two():
                             pygame.display.flip()
                         LISTA_NUMEROS = []
                     else:
-                        instructionText = myfont.render('Expressão mal formada, tente novamente!', 1, (WHITE))
+                        instructionText = myfont.render(
+                            'Expressão mal formada, tente novamente!', 1, (WHITE))
                         play_sound('expressao_mal_formada')
                         DISPLAYSURF.blit(instructionText, (50, 0))
             elif event.type == BOTAO_RETORNAR:
@@ -294,7 +324,7 @@ def level_three():
     play_sound(str(a))
     play_sound('Igual_a')
     play_sound(str(b))
-    
+
     # posicionando as instrucoes na tela
     for i in range(len(instructionText)):
         instSurf = BASICFONT.render(instructionText[i], 1, TEXTCOLOR)
@@ -417,59 +447,19 @@ def calculate_equacao(a, b, value):
         return False
 
 
-# sounds
-
-# dicionario sonoro de instrucoes
-INSTRUCTIONSDICT = {
-    'titulo': 'BCM.mp3',
-    'intro': 'intro.mp3',
-    'botao_avancar_sound': 'botao_avancar.mp3',
-    'certo': 'aplausos.mp3',
-    'erro': 'erro.mp3',
-    'incorreto': 'tente_novamente.mp3',
-    'expressao_mal_formada': 'Expressao_mal_formada.mp3',
-    'fase1': 'fase1.mp3',
-    'fase2': 'fase2.mp3',
-    'fase3': 'fase3.mp3'
-}
-
-# dicionario sonoro dos numeros e operacoes
-SOUNDSDICT = {
-    '1': 'Número_1.mp3',
-    '2': 'Número_2.mp3',
-    '3': 'Número_3.mp3',
-    '4': 'Número_4.mp3',
-    '5': 'Número_5.mp3',
-    '6': 'Número_6.mp3',
-    '7': 'Número_7.mp3',
-    '8': 'Número_8.mp3',
-    '9': 'Número_9.mp3',
-    '=': 'Igual_a.mp3',
-    '+': 'Mais.mp3',
-    '*': 'Vezes.mp3',
-    'x': 'x.mp3'
-}
-
+def sound_init(path):
+    path = "resources/sounds/" + path
+    canonicalized_path = path.replace('/', os.sep).replace('\\', os.sep)
+    sound = mixer.Sound(canonicalized_path)
+    return sound
 
 def play_sound(value):
     if SOUNDSDICT.has_key(value):
-        value = SOUNDSDICT[value]
-        play(value)
-    elif INSTRUCTIONSDICT.has_key(value):
-        value = INSTRUCTIONSDICT[value]
-        play(value)
-
-
-# metodo para acessar os arquivos mp3 da pasta
-def play(path):
-    path = "resources/sounds/" + path
-    canonicalized_path = path.replace('/', os.sep).replace('\\', os.sep)
-    pygame.mixer.music.load(canonicalized_path)
-    pygame.mixer.music.set_volume(1.0)
-    pygame.mixer.music.play()
-    #sound = mixer.Sound(canonicalized_path)
-    #channel = mixer.find_channel()
-    #channel.queue(sound)
+        sound = SOUNDSDICT[value]
+        channel = mixer.Channel(1)
+        channel.queue(sound)
+    else:
+        print('sound not found on sounds dictionary!')
 
 
 def terminate():
@@ -477,7 +467,6 @@ def terminate():
     sys.exit()
 
 # serial reading
-
 class SerialThread (threading.Thread):
 
     def __init__(self):
