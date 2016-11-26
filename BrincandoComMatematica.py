@@ -340,16 +340,18 @@ SOUNDSDICT = {
 def play_sound(value):
     if SOUNDSDICT.has_key(value):
         value = SOUNDSDICT[value]
-        play_sound(value)
+        play(value)
     elif INSTRUCTIONSDICT.has_key(value):
         value = INSTRUCTIONSDICT[value]
-        play_sound(value)
+        play(value)
 
 
 # metodo para acessar os arquivos mp3 da pasta
 def play(path):
-    path = "/resources/sounds/" + path
+    print(path)
+    path = "resources/sounds/" + path
     canonicalized_path = path.replace('/', os.sep).replace('\\', os.sep)
+    print(path)
     pygame.mixer.music.load(canonicalized_path)
     pygame.mixer.music.set_volume(1.0)
     pygame.mixer.music.play()
