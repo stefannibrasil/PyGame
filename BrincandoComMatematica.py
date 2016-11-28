@@ -123,7 +123,6 @@ def start_screen():
     topCoord += titleRect.height
 
     game_music.set_volume(0.2)
-    game_music.play()
     instructionText = ['Aprenda Matematica de um jeito mais divertido!',
                        'Aperte os botoes para jogar']
     play_sound('titulo')
@@ -184,6 +183,7 @@ def level_one():  # Tela que checa resultado da operacao escolhida pelo usuario
 
     while True:
         if ACERTOS > 1:
+            play_sound('certo')
             ACERTOS = 0
             level_two()
         for event in pygame.event.get():
@@ -215,7 +215,6 @@ def level_one():  # Tela que checa resultado da operacao escolhida pelo usuario
                             play_sound('certo')
                             pygame.display.flip()
                             ACERTOS += 1
-                            print(ACERTOS)
                         else:
                             play_sound(value)
                             DISPLAYSURF.fill(BGCOLOR)
@@ -261,6 +260,7 @@ def level_two():
 
     while True:
         if ACERTOS > 1:
+           play_sound('certo')
            ACERTOS = 0
            level_three()
         for event in pygame.event.get():
