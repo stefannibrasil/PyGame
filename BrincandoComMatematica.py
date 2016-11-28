@@ -144,7 +144,7 @@ def start_screen():
         events = pygame.event.get()
         for event in events:
             if event.type == BOTAO_AVANCAR:
-                level_three()
+                level_one()
             elif event.type == BOTAO_SAIR:
                 terminate()
             elif event.type == pygame.KEYDOWN:
