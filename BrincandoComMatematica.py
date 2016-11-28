@@ -16,7 +16,7 @@ from pygame import mixer
 
 # aqui inicializamos o mixer para tocar as músicas
 
-pygame.mixer.pre_init(22050, -16, 2, 4096)
+pygame.mixer.pre_init(22050, -16, 2, 10000)
 pygame.mixer.init()
 os.getcwd()
 game_music = mixer.Sound("resources/sounds/flight-master-short.wav")
@@ -45,10 +45,10 @@ CARDSDICT = {
 }
 
 # sorteio do level_two para deixar a random_index como variavel global
-numeros = [4, 5, 6, 7, 8, 9]
-random_index = random.randint(4, len(numeros))
-a = randrange(4, len(numeros))
-b = randrange(4, len(numeros))
+random_index = random.randint(4, 9)
+a = randrange(2, 8)
+b = randrange(a+1, 9)
+# x + a > 2
 
 # tamanhos das telas
 FPS = 30
@@ -98,6 +98,7 @@ def main():
         'expressao_mal_formada': sound_init('Expressao_mal_formada.wav'),
         'fase1':                 sound_init('fase1.wav'),
         'fase2':                 sound_init('fase2.wav'),
+        'fase3':                 sound_init('fase3.wav'),
         '1':                     sound_init('Número_1.wav'),
         '2':                     sound_init('Número_2.wav'),
         '3':                     sound_init('Número_3.wav'),
@@ -109,7 +110,8 @@ def main():
         '9':                     sound_init('Número_9.wav'),
         '=':                     sound_init('Igual_a.wav'),
         '+':                     sound_init('Mais.wav'),
-        '*':                     sound_init('Vezes.wav')
+        '*':                     sound_init('Vezes.wav'),
+        'x':                     sound_init('x.wav')
     }
 
     start_screen()  # mainScreen espera o usuario apertar o botao_avancar para chamar a start_screen
@@ -245,6 +247,7 @@ def level_two():
                        str(random_index)]
     play_sound('fase2')
     play_sound(str(random_index))
+
     # posicionando as instrucoes na tela
     for i in range(len(instructionText)):
         instSurf = BASICFONT.render(instructionText[i], 1, TEXTCOLOR)
@@ -312,28 +315,20 @@ def level_two():
 
 def level_three():
     global ACERTOS, a, b
-    topCoord = 60  # posiciona o topo do texto
     DISPLAYSURF.fill(BGCOLOR)
     myfont = pygame.font.SysFont('freesansbold.ttf', 45)
     LISTA_NUMEROS = []
-    instructionText = ['Qual o valor de x?',
-                       'x + str(a) = str(b)']
+    instrucao_1 = myfont.render('Qual o valor de x?', 1, WHITE)
+    DISPLAYSURF.blit(instrucao_1, (60, 120))
+    instructionText = myfont.render('x + ' + str(a) + ' = ' + str(b), 1, WHITE)
+    DISPLAYSURF.blit(instructionText, (150, 160))
     play_sound('fase3')
-    play_sound('x.mp3')
-    play_sound('mais')
+    play_sound('x')
+    play_sound('+')
     play_sound(str(a))
-    play_sound('Igual_a')
+    play_sound('=')
     play_sound(str(b))
 
-    # posicionando as instrucoes na tela
-    for i in range(len(instructionText)):
-        instSurf = BASICFONT.render(instructionText[i], 1, TEXTCOLOR)
-        instRect = instSurf.get_rect()
-        topCoord += 5  # 10 pixels will go in between each line of text.
-        instRect.top = topCoord
-        instRect.centerx = HALF_WINWIDTH
-        topCoord += instRect.height  # Adjust for the height of the line.
-        DISPLAYSURF.blit(instSurf, instRect)
 
     x = 60
     y = 180
@@ -356,21 +351,21 @@ def level_three():
             elif event.type == CARD:
                 key = event.code
                 value = CARDSDICT[key]
-                playSound(value)
+                play_sound(value)
                 label = myfont.render(CARDSDICT[key], 1, (255,255,255))
                 DISPLAYSURF.blit(label, (x,y))
                 x = x + 100
                 if calculate_equacao(a, b, value):
                     DISPLAYSURF.fill(BGCOLOR)
                     DISPLAYSURF.blit(IMAGESDICT['resolvido'], (150, 170))
-                    playSound('certo')
+                    play_sound('certo')
                     pygame.display.flip()
                     ACERTOS += 1
                 else:
                     DISPLAYSURF.fill(BGCOLOR)
                     DISPLAYSURF.blit(IMAGESDICT['incorreto'], (150, 170))
-                    playSound('erro')
-                    playSound('incorreto')
+                    play_sound('erro')
+                    play_sound('incorreto')
                     pygame.display.flip()
             elif event.type == BOTAO_RETORNAR:
                 level_two()
@@ -437,10 +432,16 @@ def calculate_op(LISTA_NUMEROS):
     else:
         return False
 
+#def choose_number():
+
 
 def calculate_equacao(a, b, value):
     resultado_certo = b - a
-
+    print(a)
+    print(b)
+    print(value)
+    print(resultado_certo)
+    print(resultado_certo == value)
     if resultado_certo == value:
         return True
     else:
@@ -458,8 +459,9 @@ def play_sound(value):
         sound = SOUNDSDICT[value]
         channel = mixer.Channel(1)
         channel.queue(sound)
+        print(value + ' - playing!')
     else:
-        print('sound not found on sounds dictionary!')
+        print(value + ' - sound not found on sounds dictionary!')
 
 
 def terminate():
