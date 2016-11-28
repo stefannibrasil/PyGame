@@ -29,6 +29,8 @@ BOTAO_SAIR = USEREVENT + 2
 BOTAO_RETORNAR = USEREVENT + 3
 CARD = USEREVENT + 4
 
+RANDOM_INDEX = 0
+
 # dicionario das tags RFID
 CARDSDICT = {
     'Card UID: 64 35 15 B8': '2',
@@ -44,11 +46,6 @@ CARDSDICT = {
     'Card UID: 86 D4 31 3B': '*',
 }
 
-# sorteio do level_two para deixar a random_index como variavel global
-random_index = random.randint(4, 9)
-a = randrange(2, 8)
-b = randrange(a+1, 9)
-# x + a > 2
 
 # tamanhos das telas
 FPS = 30
@@ -147,7 +144,7 @@ def start_screen():
         events = pygame.event.get()
         for event in events:
             if event.type == BOTAO_AVANCAR:
-                level_one()
+                level_three()
             elif event.type == BOTAO_SAIR:
                 terminate()
             elif event.type == pygame.KEYDOWN:
@@ -238,15 +235,17 @@ def level_one():  # Tela que checa resultado da operacao escolhida pelo usuario
 
 
 def level_two():
-    global random_index, ACERTOS
+    global RANDOM_INDEX, ACERTOS
     topCoord = 60  # posiciona o topo do texto
     DISPLAYSURF.fill(BGCOLOR)
     myfont = pygame.font.SysFont('freesansbold.ttf', 45)
     LISTA_NUMEROS = []
-    instructionText = ['Como voce consegue chegar no seguinte resultado?',
-                       str(random_index)]
+
+    RANDOM_INDEX = choose_number(2, 9)
+    instructionText = ['Com quais operacoes voce consegue chegar nesse resultado?',
+                       str(RANDOM_INDEX)]
     play_sound('fase2')
-    play_sound(str(random_index))
+    play_sound(str(RANDOM_INDEX))
 
     # posicionando as instrucoes na tela
     for i in range(len(instructionText)):
@@ -303,7 +302,7 @@ def level_two():
                         LISTA_NUMEROS = []
                     else:
                         instructionText = myfont.render(
-                            'Expressão mal formada, tente novamente!', 1, (WHITE))
+                            'Expressao mal formada, tente novamente!', 1, (WHITE))
                         play_sound('expressao_mal_formada')
                         DISPLAYSURF.blit(instructionText, (50, 0))
             elif event.type == BOTAO_RETORNAR:
@@ -319,6 +318,10 @@ def level_three():
     myfont = pygame.font.SysFont('freesansbold.ttf', 45)
     LISTA_NUMEROS = []
     instrucao_1 = myfont.render('Qual o valor de x?', 1, WHITE)
+
+    a = choose_number(2, 8)
+    b = choose_number(a+1, 9)
+
     DISPLAYSURF.blit(instrucao_1, (60, 120))
     instructionText = myfont.render('x + ' + str(a) + ' = ' + str(b), 1, WHITE)
     DISPLAYSURF.blit(instructionText, (150, 160))
@@ -335,6 +338,7 @@ def level_three():
 
     while True:  # Loop principal para a tela nivel_three
         if ACERTOS > 1:
+            play_sound('certo')
             start_screen()
         for event in pygame.event.get():
             if event.type == BOTAO_RETORNAR:
@@ -347,7 +351,7 @@ def level_three():
                 if event.key == K_l:
                     terminate()
                 if event.key == K_n:
-                    level_two()
+                    level_three()
             elif event.type == CARD:
                 key = event.code
                 value = CARDSDICT[key]
@@ -415,7 +419,7 @@ def calculate_op(LISTA_NUMEROS):
     num_2 = int(LISTA_NUMEROS[2])
     resultado = int(LISTA_NUMEROS[4])
 
-    resultado = random_index
+    resultado = RANDOM_INDEX
     resultado_certo = 0
 
     if operacao == '+':
@@ -432,17 +436,15 @@ def calculate_op(LISTA_NUMEROS):
     else:
         return False
 
-#def choose_number():
-
+def choose_number(start, end):
+    return randrange(start, end)
 
 def calculate_equacao(a, b, value):
     resultado_certo = b - a
-    print(a)
-    print(b)
-    print(value)
-    print(resultado_certo)
-    print(resultado_certo == value)
-    if resultado_certo == value:
+
+
+    print(resultado_certo == int(value))
+    if resultado_certo == int(value):
         return True
     else:
         return False
