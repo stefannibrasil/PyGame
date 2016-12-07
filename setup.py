@@ -1,19 +1,13 @@
+# -*- coding: utf-8 -*-
+#!/usr/bin/python
+# -*- coding: ascii -*-
 import cx_Freeze
-from setuptools import setup
 
 executables = [cx_Freeze.Executable("BrincandoComMatematica.py")]
 
 cx_Freeze.setup(
     name="BrincandoComMatematica",
-    options={"build_exe": {"packages":["pygame"],
-                           "packages":["random"],
-                           "packages":["sys"],
-                           "packages":["copy"],
-                           "packages":["os"],
-                           "packages":["serial"],
-                           "packages":["threading"],
-                           "include_files":["ReadAndWrite.ino/ReadAndWrite.ino.ino"],
-                           "include_files":["resources/sounds/"],
-                           "include_files":["resources/images/"]}},
+    options={"build_exe": {"packages":["pygame", "random", "sys", "copy", "os", "serial", "threading"],
+                           "include_files":['resources/sounds/', 'resources/images/']}},
     executables = executables
     )
