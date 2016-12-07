@@ -162,7 +162,7 @@ def level_one():  # Tela que checa resultado da operacao escolhida pelo usuario
     topCoord = 60  # posiciona o topo do texto
     DISPLAYSURF.fill(BGCOLOR)
     LISTA_NUMEROS = []
-    myfont = pygame.font.SysFont('freesansbold.ttf', 45)
+    myfont = pygame.font.SysFont('freesansbold.ttf', 60)
     instructionText = ['Vamos brincar com Matematica!',
                        'Forme operacoes e veja se seu resultado esta correto']
     play_sound('fase1')
@@ -181,7 +181,7 @@ def level_one():  # Tela que checa resultado da operacao escolhida pelo usuario
     y = 180
 
     while True:
-        if ACERTOS > 1:
+        if ACERTOS > 2:
             play_sound('certo')
             ACERTOS = 0
             level_two()
@@ -261,7 +261,7 @@ def level_two():
     y = 140
 
     while True:
-        if ACERTOS > 1:
+        if ACERTOS > 2:
            play_sound('certo')
            ACERTOS = 0
            level_three()
@@ -337,7 +337,7 @@ def level_three():
     y = 180
 
     while True:  # Loop principal para a tela nivel_three
-        if ACERTOS > 1:
+        if ACERTOS > 2:
             play_sound('certo')
             start_screen()
         for event in pygame.event.get():
