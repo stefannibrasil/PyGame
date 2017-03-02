@@ -144,8 +144,8 @@ def start_screen():
         for event in pygame.event.get():
             if event.type == BOTAO_SAIR:
                 terminate()
-            if event.type == KEYDOWN:
-                if event.key == K_n:
+           # if event.type == KEYDOWN:
+            #    if event.key == K_n:
             if event.type == BOTAO_AVANCAR:
                 level_one()
             elif event.type == BOTAO_SAIR:
@@ -184,7 +184,7 @@ def level_one():  # Tela que checa resultado da operacao escolhida pelo usuario
     y = 180
 
     while True:
-        if ACERTOS > 2:
+        if ACERTOS > 1:
             play_sound('certo')
             ACERTOS = 0
             level_two()
@@ -235,7 +235,7 @@ def level_one():  # Tela que checa resultado da operacao escolhida pelo usuario
             elif event.type == BOTAO_RETORNAR:
                 mainScreen()
                 return
-        ACERTOS = 0
+       
         pygame.display.update()
         FPSCLOCK.tick()
 
