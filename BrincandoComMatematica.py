@@ -53,9 +53,6 @@ WINWIDTH = 1200
 WINHEIGHT = 900
 HALF_WINWIDTH = int(WINWIDTH / 2)
 HALF_WINHEIGHT = int(WINHEIGHT / 2)
-TILEWIDTH = 50
-TILEHEIGHT = 85
-TILEFLOORHEIGHT = 40
 
 PINK = (220, 20, 60)
 WHITE = (255, 255, 255)
@@ -144,8 +141,6 @@ def start_screen():
         for event in pygame.event.get():
             if event.type == BOTAO_SAIR:
                 terminate()
-           # if event.type == KEYDOWN:
-            #    if event.key == K_n:
             if event.type == BOTAO_AVANCAR:
                 level_one()
             elif event.type == BOTAO_SAIR:
@@ -235,7 +230,7 @@ def level_one():  # Tela que checa resultado da operacao escolhida pelo usuario
             elif event.type == BOTAO_RETORNAR:
                 mainScreen()
                 return
-       
+
         pygame.display.update()
         FPSCLOCK.tick()
 
@@ -281,8 +276,10 @@ def level_two():
             if event.type == KEYDOWN:
                 if event.key == K_l:
                     terminate()
+                    print("l")
                 if event.key == K_n:
                     level_two()
+                    print("n")
             elif event.type == CARD:
                 key = event.code
                 value = CARDSDICT[key]
@@ -389,8 +386,8 @@ def check_expression(LISTA_NUMEROS):
     return (LISTA_NUMEROS[0].isdigit()
             and (LISTA_NUMEROS[1] == '+' or LISTA_NUMEROS[1] == '*')
             and LISTA_NUMEROS[2].isdigit()
-            and LISTA_NUMEROS[4].isdigit()
             and LISTA_NUMEROS[3] == '=')
+            and LISTA_NUMEROS[4].isdigit()
 
 # esta funcao calcula a operacao do level_one
 
