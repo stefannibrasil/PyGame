@@ -159,7 +159,7 @@ def level_one():  # Tela que checa resultado da operacao escolhida pelo usuario
     global ACERTOS
     topCoord = 60  # posiciona o topo do texto
     DISPLAYSURF.fill(BGCOLOR)
-    LISTA_NUMEROS = []
+    LISTA_EXPRESSAO = []
     myfont = pygame.font.SysFont('freesansbold.ttf', 60)
     instructionText = ['Vamos brincar com Matematica!',
                        'Forme operacoes e veja se seu resultado esta correto']
@@ -199,13 +199,13 @@ def level_one():  # Tela que checa resultado da operacao escolhida pelo usuario
                 key = event.code
                 value = CARDSDICT[key]
                 play_sound(value)
-                LISTA_NUMEROS.append(value)
+                LISTA_EXPRESSAO.append(value)
                 label = myfont.render(CARDSDICT[key], 1, (255, 255, 255))
                 DISPLAYSURF.blit(label, (x, y))
                 x = x + 100
-                if len(LISTA_NUMEROS) == 5:
-                    if check_expression(LISTA_NUMEROS):
-                        if calculate(LISTA_NUMEROS):
+                if len(LISTA_EXPRESSAO) == 5:
+                    if check_expression(LISTA_EXPRESSAO):
+                        if calculate(LISTA_EXPRESSAO):
                             play_sound(value)
                             DISPLAYSURF.fill(BGCOLOR)
                             DISPLAYSURF.blit(IMAGESDICT['resolvido'], (150, 170))
@@ -221,7 +221,7 @@ def level_one():  # Tela que checa resultado da operacao escolhida pelo usuario
                             play_sound('erro')
                             play_sound('incorreto')
                             pygame.display.flip()
-                        LISTA_NUMEROS = []
+                        LISTA_EXPRESSAO = []
                     else:
                         instructionText = myfont.render(
                             'Expressão mal formada, tente novamente!', 1, (WHITE))
@@ -240,7 +240,7 @@ def level_two():
     topCoord = 60  # posiciona o topo do texto
     DISPLAYSURF.fill(BGCOLOR)
     myfont = pygame.font.SysFont('freesansbold.ttf', 45)
-    LISTA_NUMEROS = []
+    LISTA_EXPRESSAO = []
 
     RANDOM_INDEX = choose_number(2, 9)
     instructionText = ['Com quais operacoes voce consegue chegar nesse resultado?',
@@ -284,13 +284,13 @@ def level_two():
                 key = event.code
                 value = CARDSDICT[key]
                 play_sound(value)
-                LISTA_NUMEROS.append(value)
+                LISTA_EXPRESSAO.append(value)
                 label = myfont.render(CARDSDICT[key], 1, (255, 255, 255))
                 DISPLAYSURF.blit(label, (x, y))
                 x = x + 100
-                if len(LISTA_NUMEROS) == 5:
-                    if check_expression(LISTA_NUMEROS):
-                        if calculate_op(LISTA_NUMEROS):
+                if len(LISTA_EXPRESSAO) == 5:
+                    if check_expression(LISTA_EXPRESSAO):
+                        if calculate_op(LISTA_EXPRESSAO):
                             DISPLAYSURF.fill(BGCOLOR)
                             DISPLAYSURF.blit(IMAGESDICT['resolvido'], (150, 170))
                             play_sound('certo')
@@ -302,7 +302,7 @@ def level_two():
                             play_sound('erro')
                             play_sound('incorreto')
                             pygame.display.flip()
-                        LISTA_NUMEROS = []
+                        LISTA_EXPRESSAO = []
                     else:
                         instructionText = myfont.render(
                             'Expressao mal formada, tente novamente!', 1, (WHITE))
@@ -319,7 +319,7 @@ def level_three():
     global ACERTOS, a, b
     DISPLAYSURF.fill(BGCOLOR)
     myfont = pygame.font.SysFont('freesansbold.ttf', 45)
-    LISTA_NUMEROS = []
+    LISTA_EXPRESSAO = []
     instrucao_1 = myfont.render('Qual o valor de x?', 1, WHITE)
 
     a = choose_number(2, 8)
@@ -382,21 +382,21 @@ def level_three():
         FPSCLOCK.tick()
 
 # aqui o jogo verifica se a operacao foi feita na ordem certa
-def check_expression(LISTA_NUMEROS):
-    return (LISTA_NUMEROS[0].isdigit()
-            and (LISTA_NUMEROS[1] == '+' or LISTA_NUMEROS[1] == '*')
-            and LISTA_NUMEROS[2].isdigit()
-            and LISTA_NUMEROS[3] == '=')
-            and LISTA_NUMEROS[4].isdigit()
+def check_expression(LISTA_EXPRESSAO):
+    return (LISTA_EXPRESSAO[0].isdigit()
+            and (LISTA_EXPRESSAO[1] == '+' or LISTA_EXPRESSAO[1] == '*')
+            and LISTA_EXPRESSAO[2].isdigit()
+            and LISTA_EXPRESSAO[3] == '=')
+            and LISTA_EXPRESSAO[4].isdigit()
 
 # esta funcao calcula a operacao do level_one
 
 
-def calculate(LISTA_NUMEROS):
-    num_1 = int(LISTA_NUMEROS[0])
-    operacao = LISTA_NUMEROS[1]
-    num_2 = int(LISTA_NUMEROS[2])
-    resultado = int(LISTA_NUMEROS[4])
+def calculate(LISTA_EXPRESSAO):
+    num_1 = int(LISTA_EXPRESSAO[0])
+    operacao = LISTA_EXPRESSAO[1]
+    num_2 = int(LISTA_EXPRESSAO[2])
+    resultado = int(LISTA_EXPRESSAO[4])
     resultado_certo = 0
 
     if operacao == '+':
@@ -416,11 +416,11 @@ def calculate(LISTA_NUMEROS):
 # esta calcula do level_two
 
 
-def calculate_op(LISTA_NUMEROS):
-    num_1 = int(LISTA_NUMEROS[0])
-    operacao = LISTA_NUMEROS[1]
-    num_2 = int(LISTA_NUMEROS[2])
-    resultado = int(LISTA_NUMEROS[4])
+def calculate_op(LISTA_EXPRESSAO):
+    num_1 = int(LISTA_EXPRESSAO[0])
+    operacao = LISTA_EXPRESSAO[1]
+    num_2 = int(LISTA_EXPRESSAO[2])
+    resultado = int(LISTA_EXPRESSAO[4])
 
     resultado = RANDOM_INDEX
     resultado_certo = 0
