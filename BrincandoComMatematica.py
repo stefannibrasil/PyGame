@@ -5,6 +5,7 @@
 # importanto as bibliotecas necessárias para o funcionamento do jogo
 import random
 from random import randrange
+from calculator import Calculator
 import sys
 import copy
 import os
@@ -15,13 +16,11 @@ from pygame.locals import *
 from pygame import mixer
 
 # aqui inicializamos o mixer para tocar as músicas
-
 pygame.mixer.pre_init(22050, -16, 2, 10000)
 pygame.mixer.init()
 os.getcwd()
 game_music = mixer.Sound("resources/sounds/flight-master-short.wav")
 game_music.play(-1)
-
 
 # tratando eventos do usuario lidos pelo Arduino
 BOTAO_AVANCAR = USEREVENT + 1
@@ -64,6 +63,7 @@ ACERTOS = 0
 def main():
     global FPSCLOCK, DISPLAYSURF, IMAGESDICT, SOUNDSDICT, TILEMAPPING, BASICFONT
 
+    calculadora = Calculator()
     pygame.init()
     pygame.font.init()
     FPSCLOCK = pygame.time.Clock()
@@ -198,6 +198,8 @@ def level_one():  # Tela que checa resultado da operacao escolhida pelo usuario
             elif event.type == CARD:
                 key = event.code
                 value = CARDSDICT[key]
+                print "oi"
+                calculadora.receber_tag(value)
                 play_sound(value)
                 LISTA_EXPRESSAO.append(value)
                 label = myfont.render(CARDSDICT[key], 1, (255, 255, 255))
@@ -386,8 +388,8 @@ def check_expression(LISTA_EXPRESSAO):
     return (LISTA_EXPRESSAO[0].isdigit()
             and (LISTA_EXPRESSAO[1] == '+' or LISTA_EXPRESSAO[1] == '*')
             and LISTA_EXPRESSAO[2].isdigit()
-            and LISTA_EXPRESSAO[3] == '=')
             and LISTA_EXPRESSAO[4].isdigit()
+            and LISTA_EXPRESSAO[3] == '=')
 
 # esta funcao calcula a operacao do level_one
 
