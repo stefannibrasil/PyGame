@@ -10,7 +10,7 @@ Baixe as bibliotecas [MFRC522](https://github.com/miguelbalboa/rfid) e [Button.h
 
 Visualmente deve ficar assim:
 
-[[https://i.ytimg.com/vi/23aMjljCLZI/maxresdefault.jpg|alt=arduino]]
+[https://i.ytimg.com/vi/23aMjljCLZI/maxresdefault.jpg]
 
 Caso dê algum erro de compilação relacionado à biblioteca Button.h, dê uma olhada [aqui](http://labdegaragem.com/forum/topics/wprogram-h)
 
