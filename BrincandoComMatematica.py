@@ -22,7 +22,7 @@ os.getcwd()
 game_music = mixer.Sound("resources/sounds/flight-master-short.wav")
 game_music.play(-1)
 
-# tratando eventos do usuario lidos pelo Arduino
+# tratando eventos do usuario lidos pelo Arduino, como botões e cards
 BOTAO_AVANCAR = USEREVENT + 1
 BOTAO_SAIR = USEREVENT + 2
 BOTAO_RETORNAR = USEREVENT + 3
@@ -30,7 +30,8 @@ CARD = USEREVENT + 4
 
 RANDOM_INDEX = 0
 
-# dicionario das tags RFID
+# dicionario das tags RFID: para adicionar novas, basta ler os codigos no monitor serial 
+# do Arduino e adicionar aqui o codigo com seu respectivo significado
 CARDSDICT = {
     'Card UID: 64 35 15 B8': '2',
     'Card UID: 5A 43 06 4C': '3',
@@ -52,11 +53,12 @@ WINWIDTH = 1200
 WINHEIGHT = 900
 HALF_WINWIDTH = int(WINWIDTH / 2)
 HALF_WINHEIGHT = int(WINHEIGHT / 2)
-
 PINK = (220, 20, 60)
 WHITE = (255, 255, 255)
 BGCOLOR = PINK
 TEXTCOLOR = WHITE
+
+#variavel global para as fases
 ACERTOS = 0
 
 
@@ -74,6 +76,7 @@ def main():
     pygame.display.set_caption("Brincando com Matemática")
     BASICFONT = pygame.font.Font('freesansbold.ttf', 18)
 
+    #dicionario de imagens
     IMAGESDICT = {
         'title': pygame.image.load('resources/images/bcm_title.png'),
         'resolvido': pygame.image.load('resources/images/resolvido.png'),
@@ -81,7 +84,7 @@ def main():
         'incorreto': pygame.image.load('resources/images/TEM_CERTEZA.png')
     }
 
-    # sounds
+    # dicionario de sons: usar arquivos com formato .wav
     SOUNDSDICT = {
         'titulo':                sound_init('BCM.wav'),
         'intro':                 sound_init('intro.wav'),
@@ -131,10 +134,10 @@ def start_screen():
     for i in range(len(instructionText)):
         instSurf = BASICFONT.render(instructionText[i], 1, TEXTCOLOR)
         instRect = instSurf.get_rect()
-        topCoord += 5  # 10 pixels will go in between each line of text.
+        topCoord += 5  
         instRect.top = topCoord
         instRect.centerx = HALF_WINWIDTH
-        topCoord += instRect.height  # Adjust for the height of the line.
+        topCoord += instRect.height  
         DISPLAYSURF.blit(instSurf, instRect)
 
     while True:  # Main loop for the start screen.
@@ -145,6 +148,8 @@ def start_screen():
                 level_one()
             elif event.type == BOTAO_SAIR:
                 terminate()
+            #enquanto os botoões nao estão funcionando, usamos teclas normais:
+            # tecla 'n' para avancar e l para fechar o jogo
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_n:
                     level_one()
@@ -475,16 +480,16 @@ def terminate():
     pygame.quit()
     sys.exit()
 
-# serial reading
+# Comunicação entre o Arduino e o código em Python, usando a biblioteca serial e thread
 class SerialThread (threading.Thread):
 
+        # aqui criamos a thread que permite que a leitura dos cartões ao mesmo
+        # tempo em que o jogo esta rodando
     def __init__(self):
         threading.Thread.__init__(self)
         self.setDaemon(True)
 
     def run(self):
-        # aqui criamos a thread que permite que a leitura dos cartões ao mesmo
-        # tempo em que o jogo esta rodando
         ser = serial.Serial('/dev/ttyACM0', 9600, timeout=1)
         while 1:
             value = ser.readline().strip()
@@ -501,6 +506,7 @@ class SerialThread (threading.Thread):
 
                 event = pygame.event.Event(event_type, code=value)
                 pygame.event.post(event)
+                # printa no console os valores lidos pelo arduino, muito bom para debugar
                 print("raised event_type = " +
                       str(event_type) + " code = " + value)
 
