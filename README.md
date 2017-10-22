@@ -8,9 +8,6 @@ Jogo desenvolvido para o Projeto de Iniciação Científica da linha de pesquisa
 
 Baixe as bibliotecas [MFRC522](https://github.com/miguelbalboa/rfid) e [Button.h](https://playground.arduino.cc/Code/Button). Para adicioná-las, vá em Sketch > Include library > ADD zip library. Depois compile normalmente. No repositório da biblioteca MFRC522 você encontra os pinos para ligar o leitor RFID ao Arduino.
 
-Visualmente deve ficar assim:
-
-[https://i.ytimg.com/vi/23aMjljCLZI/maxresdefault.jpg]
 
 Caso dê algum erro de compilação relacionado à biblioteca Button.h, dê uma olhada [aqui](http://labdegaragem.com/forum/topics/wprogram-h)
 

@@ -506,7 +506,7 @@ class SerialThread (threading.Thread):
 
                 event = pygame.event.Event(event_type, code=value)
                 pygame.event.post(event)
-                # printa no console os valores lidos pelo arduino, muito bom para debugar
+                # printa no console os valores lidos pelo arduino, muito bom para
                 print("raised event_type = " +
                       str(event_type) + " code = " + value)
 
