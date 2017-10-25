@@ -5,7 +5,7 @@
 # importanto as bibliotecas necessárias para o funcionamento do jogo
 import random
 from random import randrange
-from calculator import Calculator
+from calculadora import Calculator
 import sys
 import copy
 import os
@@ -43,7 +43,7 @@ CARDSDICT = {
     'Card UID: 8A 5D 0F 64': '7',
     'Card UID: 66 DE 2B 49': '4',
     'Card UID: CA 94 10 64': '=',
-    'Card UID: 86 D4 31 3B': '*',
+    'Card UID: 86 D4 31 3B': "fim",
 }
 
 
@@ -60,7 +60,6 @@ TEXTCOLOR = WHITE
 
 #variavel global para as fases
 ACERTOS = 0
-
 
 def main():
     global FPSCLOCK, DISPLAYSURF, IMAGESDICT, SOUNDSDICT, TILEMAPPING, BASICFONT
@@ -203,37 +202,26 @@ def level_one():  # Tela que checa resultado da operacao escolhida pelo usuario
             elif event.type == CARD:
                 key = event.code
                 value = CARDSDICT[key]
-                print "oi"
-                calculadora.receber_tag(value)
+                print value
+                Calculator.receber_tag(value)
                 play_sound(value)
-                LISTA_EXPRESSAO.append(value)
                 label = myfont.render(CARDSDICT[key], 1, (255, 255, 255))
                 DISPLAYSURF.blit(label, (x, y))
                 x = x + 100
-                if len(LISTA_EXPRESSAO) == 5:
-                    if check_expression(LISTA_EXPRESSAO):
-                        if calculate(LISTA_EXPRESSAO):
-                            play_sound(value)
-                            DISPLAYSURF.fill(BGCOLOR)
-                            DISPLAYSURF.blit(IMAGESDICT['resolvido'], (150, 170))
-                            play_sound('certo')
-                            pygame.display.flip()
-                            ACERTOS = ACERTOS + 1
-                            print(ACERTOS)
-                            ACERTOS += 1
-                        else:
-                            play_sound(value)
-                            DISPLAYSURF.fill(BGCOLOR)
-                            DISPLAYSURF.blit(IMAGESDICT['incorreto'], (150, 170))
-                            play_sound('erro')
-                            play_sound('incorreto')
-                            pygame.display.flip()
-                        LISTA_EXPRESSAO = []
-                    else:
-                        instructionText = myfont.render(
-                            'Expressão mal formada, tente novamente!', 1, (WHITE))
-                        play_sound('expressao_mal_formada')
-                        DISPLAYSURF.blit(instructionText, (50, 0))
+                if receber_tag:
+                    play_sound(value)
+                    DISPLAYSURF.fill(BGCOLOR)
+                    DISPLAYSURF.blit(IMAGESDICT['resolvido'], (150, 170))
+                    play_sound('certo')
+                    pygame.display.flip()
+                    ACERTOS = ACERTOS + 1
+                else:
+                    play_sound(value)
+                    DISPLAYSURF.fill(BGCOLOR)
+                    DISPLAYSURF.blit(IMAGESDICT['incorreto'], (150, 170))
+                    play_sound('erro')
+                    play_sound('incorreto')
+                    pygame.display.flip()
             elif event.type == BOTAO_RETORNAR:
                 mainScreen()
                 return
@@ -242,222 +230,88 @@ def level_one():  # Tela que checa resultado da operacao escolhida pelo usuario
         FPSCLOCK.tick()
 
 
-def level_two():
-    global RANDOM_INDEX, ACERTOS
-    topCoord = 60  # posiciona o topo do texto
-    DISPLAYSURF.fill(BGCOLOR)
-    myfont = pygame.font.SysFont('freesansbold.ttf', 45)
-    LISTA_EXPRESSAO = []
-
-    RANDOM_INDEX = choose_number(2, 9)
-    instructionText = ['Com quais operacoes voce consegue chegar nesse resultado?',
-                       str(RANDOM_INDEX)]
-    play_sound('fase2')
-    play_sound(str(RANDOM_INDEX))
-
-    # posicionando as instrucoes na tela
-    for i in range(len(instructionText)):
-        instSurf = BASICFONT.render(instructionText[i], 1, TEXTCOLOR)
-        instRect = instSurf.get_rect()
-        topCoord += 5  # 10 pixels will go in between each line of text.
-        instRect.top = topCoord
-        instRect.centerx = HALF_WINWIDTH
-        topCoord += instRect.height  # Adjust for the height of the line.
-        DISPLAYSURF.blit(instSurf, instRect)
-
-    x = 40
-    y = 140
-
-    while True:
-        if ACERTOS > 2:
-           play_sound('certo')
-           ACERTOS = 0
-           level_three()
-        for event in pygame.event.get():
-            if event.type == BOTAO_RETORNAR:
-                start_screen()
-            elif event.type == BOTAO_AVANCAR:
-                level_two()
-            elif event.type == BOTAO_SAIR:
-                terminate()
-            if event.type == KEYDOWN:
-                if event.key == K_l:
-                    terminate()
-                    print("l")
-                if event.key == K_n:
-                    level_two()
-                    print("n")
-            elif event.type == CARD:
-                key = event.code
-                value = CARDSDICT[key]
-                play_sound(value)
-                LISTA_EXPRESSAO.append(value)
-                label = myfont.render(CARDSDICT[key], 1, (255, 255, 255))
-                DISPLAYSURF.blit(label, (x, y))
-                x = x + 100
-                if len(LISTA_EXPRESSAO) == 5:
-                    if check_expression(LISTA_EXPRESSAO):
-                        if calculate_op(LISTA_EXPRESSAO):
-                            DISPLAYSURF.fill(BGCOLOR)
-                            DISPLAYSURF.blit(IMAGESDICT['resolvido'], (150, 170))
-                            play_sound('certo')
-                            pygame.display.flip()
-                            ACERTOS += 1
-                        else:
-                            DISPLAYSURF.fill(BGCOLOR)
-                            DISPLAYSURF.blit(IMAGESDICT['incorreto'], (150, 170))
-                            play_sound('erro')
-                            play_sound('incorreto')
-                            pygame.display.flip()
-                        LISTA_EXPRESSAO = []
-                    else:
-                        instructionText = myfont.render(
-                            'Expressao mal formada, tente novamente!', 1, (WHITE))
-                        play_sound('expressao_mal_formada')
-                        DISPLAYSURF.blit(instructionText, (50, 0))
-            elif event.type == BOTAO_RETORNAR:
-                level_one()
-                return  # usuario retorna para level_one
-
-        pygame.display.update()
-        FPSCLOCK.tick()
-
-def level_three():
-    global ACERTOS, a, b
-    DISPLAYSURF.fill(BGCOLOR)
-    myfont = pygame.font.SysFont('freesansbold.ttf', 45)
-    LISTA_EXPRESSAO = []
-    instrucao_1 = myfont.render('Qual o valor de x?', 1, WHITE)
-
-    a = choose_number(2, 8)
-    b = choose_number(a+1, 9)
-
-    DISPLAYSURF.blit(instrucao_1, (60, 120))
-    instructionText = myfont.render('x + ' + str(a) + ' = ' + str(b), 1, WHITE)
-    DISPLAYSURF.blit(instructionText, (150, 160))
-    play_sound('fase3')
-    play_sound('x')
-    play_sound('+')
-    play_sound(str(a))
-    play_sound('=')
-    play_sound(str(b))
-
-
-    x = 60
-    y = 180
-
-    while True:  # Loop principal para a tela nivel_three
-        if ACERTOS > 2:
-            play_sound('certo')
-            start_screen()
-        for event in pygame.event.get():
-            if event.type == BOTAO_RETORNAR:
-                start_screen()
-            elif event.type == BOTAO_AVANCAR:
-                level_three()
-            elif event.type == BOTAO_SAIR:
-                terminate()
-            if event.type == KEYDOWN:
-                if event.key == K_l:
-                    terminate()
-                if event.key == K_n:
-                    level_three()
-            elif event.type == CARD:
-                key = event.code
-                value = CARDSDICT[key]
-                play_sound(value)
-                label = myfont.render(CARDSDICT[key], 1, (255,255,255))
-                DISPLAYSURF.blit(label, (x,y))
-                x = x + 100
-                if calculate_equacao(a, b, value):
-                    DISPLAYSURF.fill(BGCOLOR)
-                    DISPLAYSURF.blit(IMAGESDICT['resolvido'], (150, 170))
-                    play_sound('certo')
-                    pygame.display.flip()
-                    ACERTOS += 1
-                else:
-                    DISPLAYSURF.fill(BGCOLOR)
-                    DISPLAYSURF.blit(IMAGESDICT['incorreto'], (150, 170))
-                    play_sound('erro')
-                    play_sound('incorreto')
-                    pygame.display.flip()
-            elif event.type == BOTAO_RETORNAR:
-                level_two()
-                return
-
-        pygame.display.update()
-        FPSCLOCK.tick()
-
-# aqui o jogo verifica se a operacao foi feita na ordem certa
-def check_expression(LISTA_EXPRESSAO):
-    return (LISTA_EXPRESSAO[0].isdigit()
-            and (LISTA_EXPRESSAO[1] == '+' or LISTA_EXPRESSAO[1] == '*')
-            and LISTA_EXPRESSAO[2].isdigit()
-            and LISTA_EXPRESSAO[4].isdigit()
-            and LISTA_EXPRESSAO[3] == '=')
-
-# esta funcao calcula a operacao do level_one
-
-
-def calculate(LISTA_EXPRESSAO):
-    num_1 = int(LISTA_EXPRESSAO[0])
-    operacao = LISTA_EXPRESSAO[1]
-    num_2 = int(LISTA_EXPRESSAO[2])
-    resultado = int(LISTA_EXPRESSAO[4])
-    resultado_certo = 0
-
-    if operacao == '+':
-        resultado_certo = num_1 + num_2
-    elif operacao == '-':
-        resultado_certo = num_1 - num_2
-    elif operacao == '*':
-        resultado_certo = num_1 * num_2
-    elif operacao == '/':
-        resultado_certo = num_1 / num_2
-
-    if resultado_certo == resultado:
-        return True
-    else:
-        return False
-
-# esta calcula do level_two
-
-
-def calculate_op(LISTA_EXPRESSAO):
-    num_1 = int(LISTA_EXPRESSAO[0])
-    operacao = LISTA_EXPRESSAO[1]
-    num_2 = int(LISTA_EXPRESSAO[2])
-    resultado = int(LISTA_EXPRESSAO[4])
-
-    resultado = RANDOM_INDEX
-    resultado_certo = 0
-
-    if operacao == '+':
-        resultado_certo = num_1 + num_2
-    elif operacao == '-':
-        resultado_certo = num_1 - num_2
-    elif operacao == '*':
-        resultado_certo = num_1 * num_2
-    elif operacao == '/':
-        resultado_certo = num_1 / num_2
-
-    if resultado_certo == resultado:
-        return True
-    else:
-        return False
-
-def choose_number(start, end):
-    return randrange(start, end)
-
-def calculate_equacao(a, b, value):
-    resultado_certo = b - a
-
-
-    print(resultado_certo == int(value))
-    if resultado_certo == int(value):
-        return True
-    else:
-        return False
+# def level_two():
+    # global RANDOM_INDEX, ACERTOS
+    # topCoord = 60  # posiciona o topo do texto
+    # DISPLAYSURF.fill(BGCOLOR)
+    # myfont = pygame.font.SysFont('freesansbold.ttf', 45)
+    # LISTA_EXPRESSAO = []
+# 
+    # RANDOM_INDEX = choose_number(2, 9)
+    # instructionText = ['Com quais operacoes voce consegue chegar nesse resultado?',
+                       # str(RANDOM_INDEX)]
+    # play_sound('fase2')
+    # play_sound(str(RANDOM_INDEX))
+# 
+    #posicionando as instrucoes na tela
+    # for i in range(len(instructionText)):
+        # instSurf = BASICFONT.render(instructionText[i], 1, TEXTCOLOR)
+        # instRect = instSurf.get_rect()
+        # topCoord += 5  # 10 pixels will go in between each line of text.
+        # instRect.top = topCoord
+        # instRect.centerx = HALF_WINWIDTH
+        # topCoord += instRect.height  # Adjust for the height of the line.
+        # DISPLAYSURF.blit(instSurf, instRect)
+# 
+    # x = 40
+    # y = 140
+# 
+    # while True:
+        # if ACERTOS > 2:
+           # play_sound('certo')
+           # ACERTOS = 0
+           # level_three()
+        # for event in pygame.event.get():
+            # if event.type == BOTAO_RETORNAR:
+                # start_screen()
+            # elif event.type == BOTAO_AVANCAR:
+                # level_two()
+            # elif event.type == BOTAO_SAIR:
+                # terminate()
+            # if event.type == KEYDOWN:
+                # if event.key == K_l:
+                    # terminate()
+                    # print("l")
+                # if event.key == K_n:
+                    # level_two()
+                    # print("n")
+            # elif event.type == CARD:
+                # key = event.code
+                # value = CARDSDICT[key]
+                # play_sound(value)
+                # LISTA_EXPRESSAO.append(value)
+                # label = myfont.render(CARDSDICT[key], 1, (255, 255, 255))
+                # DISPLAYSURF.blit(label, (x, y))
+                # x = x + 100
+                # if len(LISTA_EXPRESSAO) == 5:
+                    # if check_expression(LISTA_EXPRESSAO):
+                        # if calculate_op(LISTA_EXPRESSAO):
+                            # DISPLAYSURF.fill(BGCOLOR)
+                            # DISPLAYSURF.blit(IMAGESDICT['resolvido'], (150, 170))
+                            # play_sound('certo')
+                            # pygame.display.flip()
+                            # ACERTOS += 1
+                        # else:
+                            # DISPLAYSURF.fill(BGCOLOR)
+                            # DISPLAYSURF.blit(IMAGESDICT['incorreto'], (150, 170))
+                            # play_sound('erro')
+                            # play_sound('incorreto')
+                            # pygame.display.flip()
+                        # LISTA_EXPRESSAO = []
+                    # else:
+                        # instructionText = myfont.render(
+                            # 'Expressao mal formada, tente novamente!', 1, (WHITE))
+                        # play_sound('expressao_mal_formada')
+                        # DISPLAYSURF.blit(instructionText, (50, 0))
+            # elif event.type == BOTAO_RETORNAR:
+                # level_one()
+                # return  # usuario retorna para level_one
+# 
+        # pygame.display.update()
+        # FPSCLOCK.tick()
+# 
+# def choose_number(start, end):
+    # return randrange(start, end)
 
 
 def sound_init(path):

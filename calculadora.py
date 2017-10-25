@@ -32,7 +32,7 @@ class Calculator:
         }
         func = operators.get(operator)
 
-        print operators.get(operator)
+        #print operators.get(operator)
 
         return func(v1, v2)
 
@@ -49,12 +49,12 @@ class Calculator:
         self.operacao = None
 
     def receber_tag(self, value):
-        print value
+       # print value
         if value == "fim":
             if self.leu_igual and self.resultado == self.total:
-                print "Sucesso"
+                return True
             else:
-                print "Incorreto"
+                return False
         if self.operacao == None:
             if value.isdigit():
                 self.var1 = self.var1 * 10 + int(value)
@@ -70,24 +70,32 @@ class Calculator:
             if value.isdigit():
                 self.var2 = self.var2 * 10 + int(value)
 
-        print self.toString()
+        #print self.toString()
 
-calc = Calculator()
-calc.receber_tag("1")
-calc.receber_tag("2")
-calc.receber_tag("+")
-calc.receber_tag("5")
-calc.receber_tag("7")
-calc.receber_tag("=")
-calc.receber_tag("6")
-calc.receber_tag("9")
-calc.receber_tag("fim")
-
-calc = Calculator()
-calc.receber_tag("2")
-calc.receber_tag("*")
-calc.receber_tag("5")
-calc.receber_tag("=")
-calc.receber_tag("1")
-calc.receber_tag("0")
-calc.receber_tag("fim")
+# calc = Calculator()
+# calc.receber_tag("1")
+# calc.receber_tag("2")
+# calc.receber_tag("+")
+# calc.receber_tag("5")
+# calc.receber_tag("7")
+# calc.receber_tag("=")
+# calc.receber_tag("6")
+# calc.receber_tag("9")
+# calc.receber_tag("fim")
+# 
+# calc = Calculator()
+# calc.receber_tag("2")
+# calc.receber_tag("*")
+# calc.receber_tag("5")
+# calc.receber_tag("=")
+# calc.receber_tag("1")
+# calc.receber_tag("0")
+# calc.receber_tag("fim")
+# 
+# calc = Calculator()
+# calc.receber_tag("150")
+# calc.receber_tag("/")
+# calc.receber_tag("5")
+# calc.receber_tag("=")
+# calc.receber_tag("3")
+# calc.receber_tag("fim")
