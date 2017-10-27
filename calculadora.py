@@ -49,12 +49,12 @@ class Calculator:
         self.operacao = None
 
     def receber_tag(self, value):
-       # print value
+        print "recebeu " + value
         if value == "fim":
             if self.leu_igual and self.resultado == self.total:
-                return True
+                return "ok"
             else:
-                return False
+                return "error"
         if self.operacao == None:
             if value.isdigit():
                 self.var1 = self.var1 * 10 + int(value)
@@ -70,6 +70,7 @@ class Calculator:
             if value.isdigit():
                 self.var2 = self.var2 * 10 + int(value)
 
+        return "processando"
         #print self.toString()
 
 # calc = Calculator()

@@ -3,13 +3,13 @@
 # -*- coding: ascii -*-
 
 # importanto as bibliotecas necessárias para o funcionamento do jogo
+import serial
 import random
 from random import randrange
 from calculadora import Calculator
 import sys
 import copy
 import os
-import serial
 import threading
 import pygame
 from pygame.locals import *
@@ -60,11 +60,11 @@ TEXTCOLOR = WHITE
 
 #variavel global para as fases
 ACERTOS = 0
+calculadora = Calculator()
 
 def main():
     global FPSCLOCK, DISPLAYSURF, IMAGESDICT, SOUNDSDICT, TILEMAPPING, BASICFONT
 
-    calculadora = Calculator()
     pygame.init()
     pygame.font.init()
     FPSCLOCK = pygame.time.Clock()
@@ -161,6 +161,7 @@ def start_screen():
 
 def level_one():  # Tela que checa resultado da operacao escolhida pelo usuario
     global ACERTOS
+    calculadora = Calculator()
     topCoord = 60  # posiciona o topo do texto
     DISPLAYSURF.fill(BGCOLOR)
     LISTA_EXPRESSAO = []
@@ -186,7 +187,7 @@ def level_one():  # Tela que checa resultado da operacao escolhida pelo usuario
         if ACERTOS > 1:
             play_sound('certo')
             ACERTOS = 0
-            level_two()
+            #level_two()
         for event in pygame.event.get():
             if event.type == BOTAO_RETORNAR:
                 start_screen()
@@ -202,21 +203,18 @@ def level_one():  # Tela que checa resultado da operacao escolhida pelo usuario
             elif event.type == CARD:
                 key = event.code
                 value = CARDSDICT[key]
-                print value
-                Calculator.receber_tag(value)
+                receber_tag = calculadora.receber_tag(value)
                 play_sound(value)
                 label = myfont.render(CARDSDICT[key], 1, (255, 255, 255))
                 DISPLAYSURF.blit(label, (x, y))
                 x = x + 100
-                if receber_tag:
-                    play_sound(value)
+                if receber_tag == "ok":
                     DISPLAYSURF.fill(BGCOLOR)
                     DISPLAYSURF.blit(IMAGESDICT['resolvido'], (150, 170))
                     play_sound('certo')
                     pygame.display.flip()
                     ACERTOS = ACERTOS + 1
-                else:
-                    play_sound(value)
+                elif receber_tag == "error":
                     DISPLAYSURF.fill(BGCOLOR)
                     DISPLAYSURF.blit(IMAGESDICT['incorreto'], (150, 170))
                     play_sound('erro')
